@@ -1,0 +1,72 @@
+.dapps-page {
+  color: rgba(255, 255, 255, .85);
+}
+
+.modal {
+  color: rgba(255, 255, 255, .85);
+
+  .modal-header {
+    border-bottom: 1px solid #dee2e6;
+
+    button {
+      font-size: 12px;
+    }
+  }
+
+  .modal-content {
+    background-color: rgb(2 28 38);
+    border: 1px solid rgba(0, 0, 0, .2);
+  }
+
+  .btn-success {
+    color: #fff;
+    background-color: #019e4c;
+    border-color: #019e4c;
+    font-size: 12px;
+    padding: 8px 25px;
+  }
+  .btn-secondary {
+    color: #fff;
+    background-color: #94614f;
+    border-color: #94614f;
+    font-size: 12px;
+    padding: 8px 25px;
+  }
+}
+
+.form-control,
+form-select {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  background-clip: padding-box;
+  border-radius: 0.25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  border: 0px solid #e5eaef;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff !important;
+}
+
+.form-control:focus {
+  background-color: rgba(0, 0, 0, .2);
+  box-shadow: 0 0 0 0.2rem rgb(255 255 255 / 45%);
+}
+
+label {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.form-control:disabled,
+.form-control[readonly] {
+  background-color: rgba(21, 14, 14, 0.45);
+  opacity: 1;
+}
