@@ -1,4 +1,6 @@
-# SceneGen
+# defidetective.app
+
+###
 
 ## Quick Start
 
@@ -60,6 +62,8 @@ coreui-free-react-admin-template
 │   ├── components/  # common components - header, footer, sidebar, etc.
 │   ├── layouts/     # layout containers
 │   ├── scss/        # scss styles
+│   ├── provider/    # custom axios, local strage, etc
+│   ├── utils/       # custom useful functions
 │   ├── views/       # application views
 │   ├── _nav.js      # sidebar navigation config
 │   ├── App.js
