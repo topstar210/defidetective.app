@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  // baseURL: process.env.REACT_APP_API_ENDPOINT_URI,
-  baseURL: "http://127.0.0.14/api",
+  baseURL: process.env.REACT_APP_API_ENDPOINT_URI,
   headers: {
     "Access-Control-Allow-Origin": "*",
   },
@@ -55,5 +54,17 @@ API.tokens = {
   getData       : () => API.get(`/tokens/get`),
   saveData      : (data) => API.post(`/tokens/save`, data),
   deleteRowById : (rid) => API.post(`/tokens/delete`, { rid }),
+};
+
+API.influencer = {
+  getData       : () => API.get(`/influencer/get`),
+  saveData      : (data) => API.post(`/influencer/save`, data),
+  deleteRowById : (rid) => API.post(`/influencer/delete`, { rid }),
+};
+
+API.partner = {
+  getData       : () => API.get(`/partner/get`),
+  saveData      : (data) => API.post(`/partner/save`, data),
+  deleteRowById : (rid) => API.post(`/partner/delete`, { rid }),
 };
 export default API;

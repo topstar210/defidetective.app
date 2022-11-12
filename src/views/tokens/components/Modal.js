@@ -22,7 +22,8 @@ const Modal = (props) => {
     }
 
     const handleClickSubmit = async() => {
-        await dispatch(props.saveAppInfo(tokenState));
+        // console.log(tokenState);
+        await dispatch(props.saveData(tokenState));
         props.setMVisible(false)
 
     }
@@ -30,9 +31,6 @@ const Modal = (props) => {
     useEffect(() => {
         setTokenState({
             ...props.selectedData,
-            mining_group_name: props.selectedData.mining_group,
-            age: props.selectedData.ages,
-            token: props.selectedData.coin_token,
             showflag: props.selectedData.show_flag ? "show" : "hide"
         });
     }, [props.selectedData])
@@ -40,10 +38,10 @@ const Modal = (props) => {
     return (
         <CModal size="lg" visible={props.visible} onClose={() => props.setMVisible(false)}>
             <CModalHeader>
-                <CModalTitle>Add ROI DAPP</CModalTitle>
+                <CModalTitle>Token</CModalTitle>
             </CModalHeader>
             <CModalBody>
-                <CRow className="mb-3">
+                <CRow>
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
@@ -67,9 +65,31 @@ const Modal = (props) => {
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="logo_url"
-                            label="LOGO"
-                            value={tokenState.logo_url || ""}
+                            id="website"
+                            label="WEBSITE"
+                            value={tokenState.website || ""}
+                            onChange={(e) => handleChange(e)}
+                            placeholder="https://website.com"
+                        />
+                    </CCol>
+                    <CCol lg={3}>
+                        <CFormInput
+                            type="text"
+                            id="presale_buy"
+                            label="PRESALE / BUY"
+                            value={tokenState.presale_buy || ""}
+                            onChange={(e) => handleChange(e)}
+                            placeholder=""
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
+                    <CCol lg={3}>
+                        <CFormInput
+                            type="text"
+                            id="chart"
+                            label="CHART"
+                            value={tokenState.chart || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder=""
                         />
@@ -77,68 +97,44 @@ const Modal = (props) => {
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="defi_badge"
-                            label="DEFI BADGE"
-                            value={tokenState.defi_badge || ""}
+                            id="chain"
+                            label="CHAIN"
+                            value={tokenState.chain || ""}
                             onChange={(e) => handleChange(e)}
-                            placeholder="DEFI BADGE"
+                            placeholder=""
                         />
                     </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                    <CCol lg={4}>
+                    <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="tg_group"
+                            id="telegram"
                             label="TELEGRAM"
-                            value={tokenState.tg_group || ""}
+                            value={tokenState.telegram || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="https://t.me/WCMdineBUSD"
                         />
                     </CCol>
-                    <CCol lg={4}>
+                    <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="discode_link"
+                            id="discord"
                             label="DISCORD"
-                            value={tokenState.discode_link || ""}
+                            value={tokenState.discord || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="https://discord.gg/Pgj3XqFy4d"
                         />
                     </CCol>
-                    <CCol lg={4}>
+                    <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="twitter_link"
+                            id="twitter"
                             label="TWITTER"
-                            value={tokenState.twitter_link || ""}
+                            value={tokenState.twitter || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="https://twitter.com/WolfdOfCrypto885"
                         />
                     </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                    <CCol lg={4}>
-                        <CFormInput
-                            type="text"
-                            id="token"
-                            label="TOKEN"
-                            value={tokenState.token || ""}
-                            onChange={(e) => handleChange(e)}
-                            placeholder="BUSD"
-                        />
-                    </CCol>
-                    <CCol lg={4}>
-                        <CFormInput
-                            type="text"
-                            id="contract"
-                            label="CONTRACT"
-                            value={tokenState.contract || ""}
-                            onChange={(e) => handleChange(e)}
-                            placeholder="https://bscscan.com/address/0xbcae54cdf6a1b1cd0ec3d44114b452179a96c1e3"
-                        />
-                    </CCol>
-                    <CCol lg={4}>
+                    <CCol lg={3}>
                         <CFormInput
                             type="text"
                             id="audit"
@@ -148,51 +144,49 @@ const Modal = (props) => {
                             placeholder="https://georgestamp.xyz/2022/09/wc-miner/"
                         />
                     </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                    <CCol ls={6}>
+                    <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="fees"
-                            label="FEES"
-                            value={tokenState.fees || ""}
+                            id="contract"
+                            label="CONTRACT"
+                            value={tokenState.contract || ""}
                             onChange={(e) => handleChange(e)}
-                            placeholder="ex: 10% / 2%"
+                            placeholder="https://bscscan.com/address/0xbcae54cdf6a1b1cd0ec3d44114b452179a96c1e3"
                         />
                     </CCol>
+                    <CCol lg={3}>
+                        <CFormInput
+                            type="text"
+                            id="kyc"
+                            label="DEFI BADGE"
+                            value={tokenState.kyc || ""}
+                            onChange={(e) => handleChange(e)}
+                            placeholder="DEFI BADGE"
+                        />
+                    </CCol>
+                </CRow>
+                <CRow>
                     <CCol ls={6}>
                         <CFormInput
                             type="date"
-                            id="age"
-                            value={tokenState.age || ""}
+                            id="launch"
+                            value={tokenState.launch || ""}
                             onChange={(e) => handleChange(e)}
-                            label="AGE(LAUNCH DATE)"
-                        />
-                    </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                    <CCol ls={6}>
-                        <CFormInput
-                            type="text"
-                            id="daily"
-                            label="DAILY%"
-                            value={tokenState.daily || ""}
-                            onChange={(e) => handleChange(e)}
-                            placeholder="ex: 5%"
+                            label="LAUNCH"
                         />
                     </CCol>
                     <CCol ls={6}>
                         <CFormInput
-                            type="text"
-                            id="tvl"
-                            label="TVL"
-                            value={tokenState.tvl || ""}
+                            type="number"
+                            id="price"
+                            label="DECIMALS"
+                            value={tokenState.price || ""}
                             onChange={(e) => handleChange(e)}
-                            disabled
+                            placeholder=""
                         />
                     </CCol>
                 </CRow>
-                <CRow className="mb-3">
+                <CRow>
                     <CCol ls={6}>
                         <div className="form-group">
                             <label htmlFor="level">LEVEL</label>
