@@ -27,7 +27,7 @@ const columns = [
   { key: 'coin', label: 'COIN', _props: { scope: 'col' }, },
   { key: 'name', label: 'NAME', _props: { scope: 'col' }, },
   { key: 'website', label: 'WEBSITE', _props: { scope: 'col' }, },
-  { key: 'defi_badge', label: 'DEFI BADGE', _props: { scope: 'col' }, },
+  { key: 'kyc', label: 'DEFI BADGE', _props: { scope: 'col' }, },
   { key: 'presale_buy', label: 'PRESALE/BUY', _props: { scope: 'col' }, },
   { key: 'chart', label: 'CHART', _props: { scope: 'col' }, },
   { key: 'chain', label: 'CHAIN', _props: { scope: 'col' }, },
@@ -37,7 +37,7 @@ const columns = [
   { key: 'audit', label: 'AUDIT', _props: { scope: 'col' }, },
   { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
   { key: 'launch', label: 'LAUNCH', _props: { scope: 'col' }, },
-  { key: 'decimals', label: 'DECIMALS', _props: { scope: 'col' }, },
+  { key: 'price', label: 'DECIMALS', _props: { scope: 'col' }, },
 ];
 // table data
 let appData = {};
@@ -97,7 +97,7 @@ const Tokens = () => {
                       target="_blank"
                       href={val.website}
                     ><span className="badge bg-success-gradient">{val.website && "website"}</span></CLink>,
-      defi_badge    : <CLink
+      kyc           : <CLink
                       target="_blank"
                       href={val.kyc}
                     >
@@ -113,21 +113,21 @@ const Tokens = () => {
       chain         : val.chain || "  ",
       telegram      : <CLink
                       target="_blank"
-                      href={val.tg_group}
+                      href={val.telegram}
                     >
-                      <span className="badge bg-success-gradient">{val.tg_group && "telegram"}</span>
+                      <span className="badge bg-success-gradient">{val.telegram && "telegram"}</span>
                     </CLink>,
       discord       : <CLink
                     target="_blank"
-                    href={val.discode_link}
+                    href={val.discord}
                     >
-                      <span className="badge bg-success-gradient">{val.discode_link && "discord"}</span>
+                      <span className="badge bg-success-gradient">{val.discord && "discord"}</span>
                     </CLink>,
       twitter       : <CLink
                         target="_blank"
-                        href={val.twitter_link}
+                        href={val.twitter}
                       >
-                        <span className="badge bg-success-gradient">{val.twitter_link && "twitter"}</span>
+                        <span className="badge bg-success-gradient">{val.twitter && "twitter"}</span>
                       </CLink>,
       audit          : <CLink
                         target="_blank"
@@ -142,7 +142,7 @@ const Tokens = () => {
                       <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
                     </CLink>,
       launch        : val.launch || " ",
-      decimals      : " ",
+      price         : val.price || " ",
       _props: {
         className: "level_" + val.level + " " + splitbar
       }

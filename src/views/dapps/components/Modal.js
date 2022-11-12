@@ -43,7 +43,7 @@ const Modal = (props) => {
                 <CModalTitle>Add ROI DAPP</CModalTitle>
             </CModalHeader>
             <CModalBody>
-                <CRow className="mb-3">
+                <CRow>
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
@@ -85,7 +85,7 @@ const Modal = (props) => {
                         />
                     </CCol>
                 </CRow>
-                <CRow className="mb-3">
+                <CRow>
                     <CCol lg={4}>
                         <CFormInput
                             type="text"
@@ -117,7 +117,7 @@ const Modal = (props) => {
                         />
                     </CCol>
                 </CRow>
-                <CRow className="mb-3">
+                <CRow>
                     <CCol lg={4}>
                         <CFormInput
                             type="text"
@@ -149,7 +149,7 @@ const Modal = (props) => {
                         />
                     </CCol>
                 </CRow>
-                <CRow className="mb-3">
+                <CRow>
                     <CCol ls={6}>
                         <CFormInput
                             type="text"
@@ -170,7 +170,7 @@ const Modal = (props) => {
                         />
                     </CCol>
                 </CRow>
-                <CRow className="mb-3">
+                <CRow>
                     <CCol ls={6}>
                         <CFormInput
                             type="text"
@@ -192,7 +192,7 @@ const Modal = (props) => {
                         />
                     </CCol>
                 </CRow>
-                <CRow className="mb-3">
+                <CRow>
                     <CCol ls={6}>
                         <div className="form-group">
                             <label htmlFor="level">LEVEL</label>

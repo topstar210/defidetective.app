@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  // baseURL: process.env.REACT_APP_API_ENDPOINT_URI,
-  baseURL: "http://127.0.0.14/api",
+  baseURL: process.env.REACT_APP_API_ENDPOINT_URI,
   headers: {
     "Access-Control-Allow-Origin": "*",
   },
