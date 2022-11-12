@@ -135,6 +135,7 @@ a{
     color: yellow;
     font-weight: 700;
     text-align: center;
+    padding: 0;
     
     .website_link{
       color: yellow;
@@ -155,5 +156,8 @@ a{
     border-bottom-width: 10px;
     // border-bottom-style: double;
     border-bottom-color: yellow;
+  }
+  .level_1{
+    background: #00004e;
   }
 }

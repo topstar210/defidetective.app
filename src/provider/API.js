@@ -47,5 +47,7 @@ API.auth = {
 
 API.dapps = {
   getList: () => API.get(`/dapps/get`),
+  saveAppInfo: (data) => API.post(`/dapps/save`, data),
+  deleteRowById: (rid) => API.post(`/dapps/delete`, { rid }),
 };
 export default API;

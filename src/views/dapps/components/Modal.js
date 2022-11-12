@@ -8,11 +8,32 @@ import {
     CButton,
     CFormInput,
     CRow,
-    CCol,
-    CFormSelect
+    CCol
 } from '@coreui/react'
+import { useDispatch } from "react-redux";
+
 
 const Modal = (props) => {
+    const dispatch = useDispatch();
+    const [ roiAppState, setRoiAppState ] = useState({});
+    
+    const handleChange = (e) => {
+        setRoiAppState({ ...roiAppState, [e.target.id]: e.target.value })
+    }
+
+    const handleClickSubmit = () => {
+        dispatch(props.saveAppInfo(roiAppState));
+    }
+
+    useEffect(()=>{
+      setRoiAppState({
+        ...props.selectedData,
+        mining_group_name   : props.selectedData.mining_group,
+        age                 : props.selectedData.ages,
+        token               : props.selectedData.coin_token,
+      });
+    },[props.selectedData])
+
     return (
         <CModal size="lg" visible={props.visible} onClose={() => props.setMVisible(false)}>
             <CModalHeader>
@@ -23,16 +44,20 @@ const Modal = (props) => {
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="website_url"
+                            id="mining_group_url"
                             label="WEBSITE URL"
+                            value = { roiAppState.mining_group_url || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="ex: https://wealthmountain.app/binance"
                         />
                     </CCol>
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="website"
+                            id="mining_group_name"
                             label="WEBSITE"
+                            value = { roiAppState.mining_group_name || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="ex: Wealth Mountain"
                         />
                     </CCol>
@@ -41,14 +66,18 @@ const Modal = (props) => {
                             type="text"
                             id="defi_badge"
                             label="DEFI BADGE"
+                            value = { roiAppState.defi_badge || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="DEFI BADGE"
                         />
                     </CCol>
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="logo"
+                            id="logo_url"
                             label="LOGO"
+                            value = { roiAppState.logo_url || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder=""
                         />
                     </CCol>
@@ -57,24 +86,30 @@ const Modal = (props) => {
                     <CCol lg={4}>
                         <CFormInput
                             type="text"
-                            id="telegram"
+                            id="tg_group"
                             label="TELEGRAM"
+                            value = { roiAppState.tg_group || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="https://t.me/WCMdineBUSD"
                         />
                     </CCol>
                     <CCol lg={4}>
                         <CFormInput
                             type="text"
-                            id="discord"
+                            id="discode_link"
                             label="DISCORD"
+                            value = { roiAppState.discode_link || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="https://discord.gg/Pgj3XqFy4d"
                         />
                     </CCol>
                     <CCol lg={4}>
                         <CFormInput
                             type="text"
-                            id="twitter"
+                            id="twitter_link"
                             label="TWITTER"
+                            value = { roiAppState.twitter_link || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="https://twitter.com/WolfdOfCrypto885"
                         />
                     </CCol>
@@ -85,6 +120,8 @@ const Modal = (props) => {
                             type="text"
                             id="token"
                             label="TOKEN"
+                            value = { roiAppState.token || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="BUSD"
                         />
                     </CCol>
@@ -93,6 +130,8 @@ const Modal = (props) => {
                             type="text"
                             id="contract"
                             label="CONTRACT"
+                            value = { roiAppState.contract || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="https://bscscan.com/address/0xbcae54cdf6a1b1cd0ec3d44114b452179a96c1e3"
                         />
                     </CCol>
@@ -101,6 +140,8 @@ const Modal = (props) => {
                             type="text"
                             id="audit"
                             label="AUDIT"
+                            value = { roiAppState.audit || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="https://georgestamp.xyz/2022/09/wc-miner/"
                         />
                     </CCol>
@@ -111,6 +152,8 @@ const Modal = (props) => {
                             type="text"
                             id="fees"
                             label="FEES"
+                            value = { roiAppState.fees || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="ex: 10% / 2%"
                         />
                     </CCol>
@@ -118,6 +161,8 @@ const Modal = (props) => {
                         <CFormInput
                             type="date"
                             id="age"
+                            value = { roiAppState.age || "" }
+                            onChange={ (e) => handleChange(e) }
                             label="AGE(LAUNCH DATE)"
                         />
                     </CCol>
@@ -128,6 +173,8 @@ const Modal = (props) => {
                             type="text"
                             id="daily"
                             label="DAILY%"
+                            value = { roiAppState.daily || "" }
+                            onChange={ (e) => handleChange(e) }
                             placeholder="ex: 5%"
                         />
                     </CCol>
@@ -136,34 +183,46 @@ const Modal = (props) => {
                             type="text"
                             id="tvl"
                             label="TVL"
+                            value = { roiAppState.tvl || "" }
+                            onChange={ (e) => handleChange(e) }
                             disabled
                         />
                     </CCol>
                 </CRow>
                 <CRow className="mb-3">
                     <CCol ls={6}>
-                        <div class="form-group">
+                        <div className="form-group">
                             <label htmlFor="level">LEVEL</label>
-                            <select id="level" class="form-control">
-                                <option value={1} selected="">1</option>
+                            <select 
+                                id="level" 
+                                value = { roiAppState.level || "" }
+                                onChange={ (e) => handleChange(e) }
+                                className="form-control">
+                                <option value={0}></option>
+                                <option value={1}>1</option>
                                 <option value={2}>2</option>
                                 <option value={3}>3</option>
                             </select>
                         </div>
                     </CCol>
                     <CCol ls={6}>
-                        <div class="form-group">
-                            <label htmlFor="level">SHOW/HIDE</label>
-                            <select id="level" class="form-control">
-                                <option value={0} selected="">SHOW</option>
-                                <option value={1}>HIDE</option>
+                        <div className="form-group">
+                            <label htmlFor="showflag">SHOW/HIDE</label>
+                            <select 
+                                id="showflag" 
+                                value = { roiAppState.showflag || "" }
+                                onChange={ (e) => handleChange(e) }
+                                className="form-control">
+                                <option value=""></option>
+                                <option value="show">SHOW</option>
+                                <option value="hide">HIDE</option>
                             </select>
                         </div>
                     </CCol>
                 </CRow>
             </CModalBody>
             <CModalFooter>
-                <CButton color="success">SAVE</CButton>
+                <CButton color="success" onClick={() => handleClickSubmit()}>SAVE</CButton>
                 <CButton color="secondary" onClick={() => props.setMVisible(false)}>
                     CLOSE
                 </CButton>

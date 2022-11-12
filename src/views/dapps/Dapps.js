@@ -10,14 +10,20 @@ import {
   CRow,
   CTable
 } from '@coreui/react'
-import { cilPlus } from '@coreui/icons'
+import { cilPlus, cilDelete, cibExpertsExchange, cilPen } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import moment from 'moment';
 
-import { getDppList, calcTVL } from "src/store/actions/dapps.actions"
+import { 
+  getDppList, 
+  calcTVL, 
+  saveAppInfo, 
+  deleteRowById
+} from "src/store/actions/dapps.actions"
 import Modal from "./components/Modal"
 import "./dapp.scss";
 
+// table header
 const columns = [
   { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
   { key: 'website', label: 'WEBSITE', _props: { scope: 'col' }, },
@@ -32,7 +38,10 @@ const columns = [
   { key: 'age', label: 'AGE', _props: { scope: 'col' }, },
   { key: 'daily_percent', label: 'DAILY%', _props: { scope: 'col' }, },
   { key: 'tvl', label: 'TVL', _props: { scope: 'col' }, },
-]
+];
+// table data
+let appData = {};
+let selectedData = {};
 
 const Dapps = () => {
   const dispatch = useDispatch();
@@ -40,76 +49,112 @@ const Dapps = () => {
   const [mVisible, setMVisible] = useState(false); // modal visible state;
 
   // initial data  ---------------
-  useEffect(()=>{ dispatch(getDppList()) },[]);
-  const { dappList } = useSelector(state => state.dapps);
-  
+  useEffect(() => { dispatch(getDppList()) }, []);
+  const { dappList, alert } = useSelector(state => state.dapps);
+
+  // if success in save an app, close the modal
+  useEffect(() => {
+    if (alert === "saved") {
+      setMVisible(false);
+    }
+  }, [alert])
+
+  // if admin, add the actions
+  if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
+    columns.push({
+      key: "action",
+      label: "E / D",
+      _props: { scope: 'col' }
+    });
+  };
+
   // handle click applybtn
   const handleClickApplyBtn = () => {
-    if(loginState == "success"){
+    if (loginState == "success") { // a user can open if logined
       setMVisible(!mVisible);
     } else {
       window.open("https://t.me/DefiSpammerAdmin", "_blank");
     }
   }
 
-  // making table rows
-  const items = dappList.map((val, ind)=>{
-    let splitbar = "";
-    if(dappList[ind+1] && val.level !== dappList[ind+1].level){
-      splitbar = "split-row-"+val.level;
+  // handle click actions(edit || delete)
+  const handleClickActions = (rId, action)=>{
+    if(action === "D"){
+      if(!confirm("Do you delete this item?")) return true;
+      dispatch(deleteRowById(rId));
+    } else {
+      selectedData = appData[rId]
+      setMVisible(true);
     }
-    return {
-      logo      : <img src={ val.logo_url } alt="" height="50" />,
-      website   : <CLink 
-                className="website_link" 
-                target="_blank" 
-                href={ val.mining_group_url }
-                >{ val.mining_group }</CLink>,
+  }
+
+  // making table rows
+  const items = dappList.map((val, ind) => {
+    appData[val.id] = val;
+
+    let splitbar = "";
+    if (dappList[ind + 1] && val.level !== dappList[ind + 1].level) {
+      splitbar = "split-row-" + val.level;
+    }
+    let resList = {
+      logo: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} alt="" /></div>,
+      website: <CLink
+            className="website_link"
+            target="_blank"
+            href={val.mining_group_url}
+          >{val.mining_group}</CLink>,
       defi_badge: <CLink
-                    target="_blank"
-                    href= { val.kyc }
-                    >
-                      <span className="badge bg-success-gradient">{ val.kyc && "defi badge"}</span>
-                    </CLink>,
-      telegram  : <CLink
-                  target="_blank"
-                  href={ val.tg_group }
-                  >
-                    <span className="badge bg-success-gradient">{val.tg_group && "telegram"}</span>
-                  </CLink>,
-      discord   : <CLink
-                  target="_blank"
-                  href={ val.discode_link }
-                  >
-                    <span className="badge bg-success-gradient">{val.discode_link && "discord"}</span>
-                  </CLink>,
-      twitter   : <CLink
-                  target="_blank"
-                  href={ val.twitter_link }
-                  >
-                    <span className="badge bg-success-gradient">{val.twitter_link && "twitter"}</span>
-                  </CLink>,
-      token     : val.coin_token,
-      contract  : <CLink
-                  target="_blank"
-                  href={ val.contract }
-                  >
-                    <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
-                  </CLink>,
-      audit     : <CLink
-                  target="_blank"
-                  href={ val.audit }
-                  >
-                    <span className="badge bg-success-gradient">{val.audit && "audit"}</span>
-                  </CLink>,
-      fees      : val.fees ? val.fees : " ",
-      age       : val.ages ? moment(val.ages, "").fromNow(true) : " ",
+        target="_blank"
+        href={val.kyc}
+      >
+        <span className="badge bg-success-gradient">{val.kyc && "defi badge"}</span>
+      </CLink>,
+      telegram: <CLink
+        target="_blank"
+        href={val.tg_group}
+      >
+        <span className="badge bg-success-gradient">{val.tg_group && "telegram"}</span>
+      </CLink>,
+      discord: <CLink
+        target="_blank"
+        href={val.discode_link}
+      >
+        <span className="badge bg-success-gradient">{val.discode_link && "discord"}</span>
+      </CLink>,
+      twitter: <CLink
+        target="_blank"
+        href={val.twitter_link}
+      >
+        <span className="badge bg-success-gradient">{val.twitter_link && "twitter"}</span>
+      </CLink>,
+      token: val.coin_token ? val.coin_token : " ",
+      contract: <CLink
+        target="_blank"
+        href={val.contract}
+      >
+        <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
+      </CLink>,
+      audit: <CLink
+        target="_blank"
+        href={val.audit}
+      >
+        <span className="badge bg-success-gradient">{val.audit && "audit"}</span>
+      </CLink>,
+      fees: val.fees ? val.fees : " ",
+      age: val.ages ? moment(val.ages, "").fromNow(true) : " ",
       daily_percent: val.daily ? val.daily : " ",
-      tvl       : calcTVL(),
-      _props    : {
-        className: "level_"+ val.level + " " + splitbar
+      tvl: calcTVL(),
+      _props: {
+        className: "level_" + val.level + " " + splitbar
       }
     }
+    if(loginState === "success" && columns[columns.length-1]['key'] === "action"){
+      resList['action'] = <>
+        <CIcon onClick={()=>handleClickActions(val.id, 'E')} icon={ cilPen } className="text-white" size="sm" /> | &nbsp;
+        <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
+      </>
+    }
+    return resList;
   })
 
   return (
@@ -167,18 +212,20 @@ const Dapps = () => {
               </CRow>
             </CCardHeader>
             <CCardBody>
-              <CButton className="apply-listing d-flex" onClick={ ()=>handleClickApplyBtn() }>
-                <CIcon icon={ cilPlus } className="text-white" size="sm" /> APPLY LISTING
+              <CButton className="apply-listing d-flex" onClick={() => handleClickApplyBtn()}>
+                <CIcon icon={cilPlus} className="text-white" size="sm" /> APPLY LISTING
               </CButton>
               <CTable columns={columns} items={items} responsive />
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
-      <Modal 
-        visible = { mVisible }
-        setMVisible = { setMVisible }
-        />
+      <Modal
+        visible={mVisible}
+        setMVisible={setMVisible}
+        saveAppInfo={saveAppInfo}
+        selectedData={selectedData}
+      />
     </div>
   )
 }
