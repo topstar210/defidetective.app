@@ -89,7 +89,7 @@ const Tokens = () => {
     if (tokenList[ind + 1] && val.level !== tokenList[ind + 1].level) {
       splitbar = "split-row-" + val.level;
     }
-    let resList = {
+    let item = {
       coin          : <div style={{ width: 50, height: 50 }}><img src={val.coin} alt="" /></div>,
       name          : val.name || " ",
       website       : <CLink
@@ -148,12 +148,12 @@ const Tokens = () => {
       }
     }
     if(loginState === "success" && columns[columns.length-1]['key'] === "action"){
-      resList['action'] = <>
+      item['action'] = <>
         <CIcon onClick={()=>handleClickActions(val.id, 'E')} icon={ cilPen } className="text-white" size="sm" /> | &nbsp;
         <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
       </>
     }
-    return resList;
+    return item;
   })
 
   return (

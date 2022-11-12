@@ -38,7 +38,7 @@ const Modal = (props) => {
     return (
         <CModal size="lg" visible={props.visible} onClose={() => props.setMVisible(false)}>
             <CModalHeader>
-                <CModalTitle>Add ROI DAPP</CModalTitle>
+                <CModalTitle>Token</CModalTitle>
             </CModalHeader>
             <CModalBody>
                 <CRow>

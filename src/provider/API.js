@@ -55,4 +55,10 @@ API.tokens = {
   saveData      : (data) => API.post(`/tokens/save`, data),
   deleteRowById : (rid) => API.post(`/tokens/delete`, { rid }),
 };
+
+API.influencer = {
+  getData       : () => API.get(`/influencer/get`),
+  saveData      : (data) => API.post(`/influencer/save`, data),
+  deleteRowById : (rid) => API.post(`/influencer/delete`, { rid }),
+};
 export default API;
