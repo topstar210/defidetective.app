@@ -61,4 +61,10 @@ API.influencer = {
   saveData      : (data) => API.post(`/influencer/save`, data),
   deleteRowById : (rid) => API.post(`/influencer/delete`, { rid }),
 };
+
+API.partner = {
+  getData       : () => API.get(`/partner/get`),
+  saveData      : (data) => API.post(`/partner/save`, data),
+  deleteRowById : (rid) => API.post(`/partner/delete`, { rid }),
+};
 export default API;
