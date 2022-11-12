@@ -19,7 +19,7 @@ const Login = () => {
   // console.log(loginState, userInfo);
   useEffect(()=>{
     if(loginState==="success"){
-      navigate("/admin/dapps");
+      navigate("/dapps");
     }
   },[loginState])
 

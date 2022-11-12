@@ -39,15 +39,21 @@ API.interceptors.response.use(
 API.auth = {
   login       : (data) => API.post(`/auth/login`, data),
   register    : (data) => API.post(`/auth/register`, data),
-  chagePassword    : (data) => API.post(`/auth/chagePassword`, data),
+  chagePassword: (data) => API.post(`/auth/chagePassword`, data),
   logout      : () => API.post(`/auth/logout`, {}),
   checkToken  : (token) => API.post(`/auth/checkToken`, {token}),
   refreshToken: () => {}
 };
 
 API.dapps = {
-  getList: () => API.get(`/dapps/get`),
-  saveAppInfo: (data) => API.post(`/dapps/save`, data),
-  deleteRowById: (rid) => API.post(`/dapps/delete`, { rid }),
+  getList       : () => API.get(`/dapps/get`),
+  saveAppInfo   : (data) => API.post(`/dapps/save`, data),
+  deleteRowById : (rid) => API.post(`/dapps/delete`, { rid }),
+};
+
+API.tokens = {
+  getData       : () => API.get(`/tokens/get`),
+  saveData      : (data) => API.post(`/tokens/save`, data),
+  deleteRowById : (rid) => API.post(`/tokens/delete`, { rid }),
 };
 export default API;

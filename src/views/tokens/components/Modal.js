@@ -15,20 +15,20 @@ import { useDispatch } from "react-redux";
 
 const Modal = (props) => {
     const dispatch = useDispatch();
-    const [roiAppState, setRoiAppState] = useState({});
+    const [tokenState, setTokenState] = useState({});
 
     const handleChange = (e) => {
-        setRoiAppState({ ...roiAppState, [e.target.id]: e.target.value })
+        setTokenState({ ...tokenState, [e.target.id]: e.target.value })
     }
 
     const handleClickSubmit = async() => {
-        await dispatch(props.saveAppInfo(roiAppState));
+        await dispatch(props.saveAppInfo(tokenState));
         props.setMVisible(false)
 
     }
 
     useEffect(() => {
-        setRoiAppState({
+        setTokenState({
             ...props.selectedData,
             mining_group_name: props.selectedData.mining_group,
             age: props.selectedData.ages,
@@ -47,31 +47,21 @@ const Modal = (props) => {
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="mining_group_url"
-                            label="WEBSITE URL"
-                            value={roiAppState.mining_group_url || ""}
+                            id="coin"
+                            label="COIN"
+                            value={tokenState.coin || ""}
                             onChange={(e) => handleChange(e)}
-                            placeholder="ex: https://wealthmountain.app/binance"
+                            placeholder=""
                         />
                     </CCol>
                     <CCol lg={3}>
                         <CFormInput
                             type="text"
-                            id="mining_group_name"
-                            label="WEBSITE"
-                            value={roiAppState.mining_group_name || ""}
+                            id="name"
+                            label="NAME"
+                            value={tokenState.name || ""}
                             onChange={(e) => handleChange(e)}
-                            placeholder="ex: Wealth Mountain"
-                        />
-                    </CCol>
-                    <CCol lg={3}>
-                        <CFormInput
-                            type="text"
-                            id="defi_badge"
-                            label="DEFI BADGE"
-                            value={roiAppState.defi_badge || ""}
-                            onChange={(e) => handleChange(e)}
-                            placeholder="DEFI BADGE"
+                            placeholder=""
                         />
                     </CCol>
                     <CCol lg={3}>
@@ -79,9 +69,19 @@ const Modal = (props) => {
                             type="text"
                             id="logo_url"
                             label="LOGO"
-                            value={roiAppState.logo_url || ""}
+                            value={tokenState.logo_url || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder=""
+                        />
+                    </CCol>
+                    <CCol lg={3}>
+                        <CFormInput
+                            type="text"
+                            id="defi_badge"
+                            label="DEFI BADGE"
+                            value={tokenState.defi_badge || ""}
+                            onChange={(e) => handleChange(e)}
+                            placeholder="DEFI BADGE"
                         />
                     </CCol>
                 </CRow>
@@ -91,7 +91,7 @@ const Modal = (props) => {
                             type="text"
                             id="tg_group"
                             label="TELEGRAM"
-                            value={roiAppState.tg_group || ""}
+                            value={tokenState.tg_group || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="https://t.me/WCMdineBUSD"
                         />
@@ -101,7 +101,7 @@ const Modal = (props) => {
                             type="text"
                             id="discode_link"
                             label="DISCORD"
-                            value={roiAppState.discode_link || ""}
+                            value={tokenState.discode_link || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="https://discord.gg/Pgj3XqFy4d"
                         />
@@ -111,7 +111,7 @@ const Modal = (props) => {
                             type="text"
                             id="twitter_link"
                             label="TWITTER"
-                            value={roiAppState.twitter_link || ""}
+                            value={tokenState.twitter_link || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="https://twitter.com/WolfdOfCrypto885"
                         />
@@ -123,7 +123,7 @@ const Modal = (props) => {
                             type="text"
                             id="token"
                             label="TOKEN"
-                            value={roiAppState.token || ""}
+                            value={tokenState.token || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="BUSD"
                         />
@@ -133,7 +133,7 @@ const Modal = (props) => {
                             type="text"
                             id="contract"
                             label="CONTRACT"
-                            value={roiAppState.contract || ""}
+                            value={tokenState.contract || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="https://bscscan.com/address/0xbcae54cdf6a1b1cd0ec3d44114b452179a96c1e3"
                         />
@@ -143,7 +143,7 @@ const Modal = (props) => {
                             type="text"
                             id="audit"
                             label="AUDIT"
-                            value={roiAppState.audit || ""}
+                            value={tokenState.audit || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="https://georgestamp.xyz/2022/09/wc-miner/"
                         />
@@ -155,7 +155,7 @@ const Modal = (props) => {
                             type="text"
                             id="fees"
                             label="FEES"
-                            value={roiAppState.fees || ""}
+                            value={tokenState.fees || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="ex: 10% / 2%"
                         />
@@ -164,7 +164,7 @@ const Modal = (props) => {
                         <CFormInput
                             type="date"
                             id="age"
-                            value={roiAppState.age || ""}
+                            value={tokenState.age || ""}
                             onChange={(e) => handleChange(e)}
                             label="AGE(LAUNCH DATE)"
                         />
@@ -176,7 +176,7 @@ const Modal = (props) => {
                             type="text"
                             id="daily"
                             label="DAILY%"
-                            value={roiAppState.daily || ""}
+                            value={tokenState.daily || ""}
                             onChange={(e) => handleChange(e)}
                             placeholder="ex: 5%"
                         />
@@ -186,7 +186,7 @@ const Modal = (props) => {
                             type="text"
                             id="tvl"
                             label="TVL"
-                            value={roiAppState.tvl || ""}
+                            value={tokenState.tvl || ""}
                             onChange={(e) => handleChange(e)}
                             disabled
                         />
@@ -198,7 +198,7 @@ const Modal = (props) => {
                             <label htmlFor="level">LEVEL</label>
                             <select
                                 id="level"
-                                value={roiAppState.level || ""}
+                                value={tokenState.level || ""}
                                 onChange={(e) => handleChange(e)}
                                 className="form-control">
                                 <option value={0}></option>
@@ -213,7 +213,7 @@ const Modal = (props) => {
                             <label htmlFor="showflag">SHOW/HIDE</label>
                             <select
                                 id="showflag"
-                                value={roiAppState.showflag}
+                                value={tokenState.showflag}
                                 onChange={(e) => handleChange(e)}
                                 className="form-control">
                                 <option value=""></option>

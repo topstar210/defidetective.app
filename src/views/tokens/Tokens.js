@@ -15,42 +15,42 @@ import CIcon from '@coreui/icons-react'
 import moment from 'moment';
 
 import { 
-  getDppList, 
-  calcTVL, 
-  saveAppInfo, 
+  getData, 
+  saveData, 
   deleteRowById
-} from "src/store/actions/dapps.actions"
+} from "src/store/actions/tokens.actions"
 import Modal from "./components/Modal"
-import "./dapp.scss";
+import "./token.scss";
 
 // table header
 const columns = [
-  { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
+  { key: 'coin', label: 'COIN', _props: { scope: 'col' }, },
+  { key: 'name', label: 'NAME', _props: { scope: 'col' }, },
   { key: 'website', label: 'WEBSITE', _props: { scope: 'col' }, },
   { key: 'defi_badge', label: 'DEFI BADGE', _props: { scope: 'col' }, },
+  { key: 'presale_buy', label: 'PRESALE/BUY', _props: { scope: 'col' }, },
+  { key: 'chart', label: 'CHART', _props: { scope: 'col' }, },
+  { key: 'chain', label: 'CHAIN', _props: { scope: 'col' }, },
   { key: 'telegram', label: 'TELEGRAM', _props: { scope: 'col' }, },
   { key: 'discord', label: 'DISCORD', _props: { scope: 'col' }, },
   { key: 'twitter', label: 'TWITTER', _props: { scope: 'col' }, },
-  { key: 'token', label: 'TOKEN', _props: { scope: 'col' }, },
-  { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
   { key: 'audit', label: 'AUDIT', _props: { scope: 'col' }, },
-  { key: 'fees', label: 'FEES', _props: { scope: 'col' }, },
-  { key: 'age', label: 'AGE', _props: { scope: 'col' }, },
-  { key: 'daily_percent', label: 'DAILY%', _props: { scope: 'col' }, },
-  { key: 'tvl', label: 'TVL', _props: { scope: 'col' }, },
+  { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
+  { key: 'launch', label: 'LAUNCH', _props: { scope: 'col' }, },
+  { key: 'decimals', label: 'DECIMALS', _props: { scope: 'col' }, },
 ];
 // table data
 let appData = {};
 let selectedData = {};
 
-const Dapps = () => {
+const Tokens = () => {
   const dispatch = useDispatch();
   const { loginState } = useSelector(state => state.sapp);
   const [mVisible, setMVisible] = useState(false); // modal visible state;
 
   // initial data  ---------------
-  useEffect(() => { dispatch(getDppList()) }, []);
-  const { dappList } = useSelector(state => state.dapps);
+  useEffect(() => { dispatch(getData()) }, []);
+  const { tokenList } = useSelector(state => state.tokens);
 
   // if admin, add the actions
   if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
@@ -82,61 +82,67 @@ const Dapps = () => {
   }
 
   // making table rows
-  const items = dappList.map((val, ind) => {
+  const items = tokenList.map((val, ind) => {
     appData[val.id] = val;
 
     let splitbar = "";
-    if (dappList[ind + 1] && val.level !== dappList[ind + 1].level) {
+    if (tokenList[ind + 1] && val.level !== tokenList[ind + 1].level) {
       splitbar = "split-row-" + val.level;
     }
     let resList = {
-      logo: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} alt="" /></div>,
-      website: <CLink
-            className="website_link"
-            target="_blank"
-            href={val.mining_group_url}
-          >{val.mining_group}</CLink>,
-      defi_badge: <CLink
-        target="_blank"
-        href={val.kyc}
-      >
-        <span className="badge bg-success-gradient">{val.kyc && "defi badge"}</span>
-      </CLink>,
-      telegram: <CLink
-        target="_blank"
-        href={val.tg_group}
-      >
-        <span className="badge bg-success-gradient">{val.tg_group && "telegram"}</span>
-      </CLink>,
-      discord: <CLink
-        target="_blank"
-        href={val.discode_link}
-      >
-        <span className="badge bg-success-gradient">{val.discode_link && "discord"}</span>
-      </CLink>,
-      twitter: <CLink
-        target="_blank"
-        href={val.twitter_link}
-      >
-        <span className="badge bg-success-gradient">{val.twitter_link && "twitter"}</span>
-      </CLink>,
-      token: val.coin_token ? val.coin_token : " ",
-      contract: <CLink
-        target="_blank"
-        href={val.contract}
-      >
-        <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
-      </CLink>,
-      audit: <CLink
-        target="_blank"
-        href={val.audit}
-      >
-        <span className="badge bg-success-gradient">{val.audit && "audit"}</span>
-      </CLink>,
-      fees: val.fees ? val.fees : " ",
-      age: val.ages ? moment(val.ages, "").fromNow(true) : " ",
-      daily_percent: val.daily ? val.daily : " ",
-      tvl: calcTVL(),
+      coin          : <div style={{ width: 50, height: 50 }}><img src={val.coin} alt="" /></div>,
+      name          : val.name || " ",
+      website       : <CLink
+                      className="website_link"
+                      target="_blank"
+                      href={val.website}
+                    ><span className="badge bg-success-gradient">{val.website && "website"}</span></CLink>,
+      defi_badge    : <CLink
+                      target="_blank"
+                      href={val.kyc}
+                    >
+                        <span className="badge bg-success-gradient">{val.kyc && "defi badge"}</span>
+                      </CLink>,
+      presale_buy   : val.presale_buy || " ",
+      chart         : <CLink
+                      target="_blank"
+                      href={val.chart}
+                    >
+                        <span className="badge bg-success-gradient">{val.chart && "chart"}</span>
+                      </CLink>,
+      chain         : val.chain || "  ",
+      telegram      : <CLink
+                      target="_blank"
+                      href={val.tg_group}
+                    >
+                      <span className="badge bg-success-gradient">{val.tg_group && "telegram"}</span>
+                    </CLink>,
+      discord       : <CLink
+                    target="_blank"
+                    href={val.discode_link}
+                    >
+                      <span className="badge bg-success-gradient">{val.discode_link && "discord"}</span>
+                    </CLink>,
+      twitter       : <CLink
+                        target="_blank"
+                        href={val.twitter_link}
+                      >
+                        <span className="badge bg-success-gradient">{val.twitter_link && "twitter"}</span>
+                      </CLink>,
+      audit          : <CLink
+                        target="_blank"
+                        href={val.audit}
+                      >
+                        <span className="badge bg-success-gradient">{val.audit && "audit"}</span>
+                      </CLink>,
+      contract      : <CLink
+                      target="_blank"
+                      href={val.contract}
+                    >
+                      <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
+                    </CLink>,
+      launch        : val.launch || " ",
+      decimals      : " ",
       _props: {
         className: "level_" + val.level + " " + splitbar
       }
@@ -151,7 +157,7 @@ const Dapps = () => {
   })
 
   return (
-    <div className='dapps-page'>
+    <div className='tokens-page'>
       <CRow className='mt-3 px-lg-3'>
         <CCol xs={12}>
           <CCard className="mb-4">
@@ -216,11 +222,11 @@ const Dapps = () => {
       <Modal
         visible={mVisible}
         setMVisible={setMVisible}
-        saveAppInfo={saveAppInfo}
+        saveData={saveData}
         selectedData={selectedData}
       />
     </div>
   )
 }
 
-export default Dapps
+export default Tokens
