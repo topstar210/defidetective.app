@@ -13,8 +13,7 @@ const routes = [
   { path: '*', name: 'page404', element: Page404 },
   { path: '/dapps', name: 'Dapps', element: Dapps },
   { path: '/tokens', role: 1, element: Tokens },
-  { path: '/admin/ads_ROI', role: 1, element: Ads_ROI },
-  { path: '/admin/ads_token', role: 1, element: Dapps },
+  { path: '/ads_manage', role: 1, element: Ads_ROI },
   { path: '/influencers', role: 1, element: Influencers },
   { path: '/partners', role: 1, element: Partners },
 ]

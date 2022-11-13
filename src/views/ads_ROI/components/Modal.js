@@ -15,7 +15,7 @@ import { useDispatch } from "react-redux";
 
 const Modal = (props) => {
     const dispatch = useDispatch();
-    const [adsState, setAdsState] = useState({level:1});
+    const [adsState, setAdsState] = useState({level:1, kind:0});
 
     const handleChange = (e) => {
         setAdsState({ ...adsState, [e.target.id]: e.target.value })
@@ -44,8 +44,9 @@ const Modal = (props) => {
     const [ itype, setItype ] = useState(false);
     const handleChooseAds = (e) => {
         setAdsState({
+            ...adsState,
             itype: !itype,
-            level: '1'
+            level: '1',
         });
         setItype(!itype);
     }
@@ -75,7 +76,7 @@ const Modal = (props) => {
                             <label htmlFor="onlineAds">Select On</label>
                             <select
                                 id="onlineAds"
-                                value={ itype }
+                                value={ adsState.itype?1:0 }
                                 onChange={(e) => handleChooseAds(e)}
                                 className="form-control">
                                 <option value={0}>Locale</option>
@@ -83,10 +84,8 @@ const Modal = (props) => {
                             </select>
                         </div>
                     </CCol>
-                </CRow>
-                <CRow>
                     {
-                        !itype &&
+                        !adsState.itype &&
                         <CCol lg={6}>
                             <CFormInput
                                 type="file"
@@ -98,7 +97,7 @@ const Modal = (props) => {
                         </CCol>
                     }
                     {
-                        itype && 
+                        adsState.itype && 
                         <CCol lg={6}>
                             <CFormInput
                                 type="text"
@@ -110,6 +109,21 @@ const Modal = (props) => {
                             />
                         </CCol>
                     }
+                </CRow>
+                <CRow>
+                    <CCol ls={6}>
+                        <div className="form-group">
+                            <label htmlFor="kind">ROI/TOKEN</label>
+                            <select
+                                id="kind"
+                                value={adsState.kind}
+                                onChange={(e) => handleChange(e)}
+                                className="form-control">
+                                <option value={0}>ROI</option>
+                                <option value={1}>TOKEN</option>
+                            </select>
+                        </div>
+                    </CCol>
                     <CCol ls={6}>
                         <div className="form-group">
                             <label htmlFor="level">LEVEL</label>

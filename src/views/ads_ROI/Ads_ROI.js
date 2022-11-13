@@ -50,7 +50,8 @@ const Ads_ROI = () => {
         let img_url = val.image ? process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + val.image : val.link;
         let item = {
             ads_img: <img src={img_url} className="my-3" alt="" />,
-            level: `level ${val.level}`
+            roi_or_token: val.kind?"TOKEN":"ROI",
+            level: `LEVEL ${val.level}`
         }
         if (loginState === "success") {
             item['action'] = <>

@@ -31,15 +31,8 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'ADS manage(ROI)',
-    to: '/admin/ads_ROI',
-    role: 1,
-    icon: <CIcon icon={ cilAlarm } customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'ADS manage(Token)',
-    to: '/admin/ads_token',
+    name: 'ADS manage',
+    to: '/ads_manage',
     role: 1,
     icon: <CIcon icon={ cilAlarm } customClassName="nav-icon" />,
   },
