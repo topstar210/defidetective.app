@@ -37,7 +37,6 @@ const columns = [
   { key: 'audit', label: 'AUDIT', _props: { scope: 'col' }, },
   { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
   { key: 'launch', label: 'LAUNCH', _props: { scope: 'col' }, },
-  { key: 'price', label: 'DECIMALS', _props: { scope: 'col' }, },
 ];
 // table data
 let appData = {};
@@ -53,13 +52,31 @@ const Tokens = () => {
   const { tokenList } = useSelector(state => state.tokens);
 
   // if admin, add the actions
-  if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
-    columns.push({
-      key: "action",
-      label: "E / D",
-      _props: { scope: 'col' }
-    });
-  };
+  useEffect(()=>{
+    if(loginState === "success") {
+      columns.push({
+        key: "price",
+        label: "DECIMALS",
+        _props: { scope: 'col' }
+      });
+      columns.push({
+        key: "action",
+        label: "E / D",
+        _props: { scope: 'col' }
+      });
+    } else {
+      columns.push({
+        key: "mcap",
+        label: "MARKET CAP",
+        _props: { scope: 'col' }
+      });
+      columns.push({
+        key: "t_price",
+        label: "PRICE",
+        _props: { scope: 'col' }
+      });
+    }
+  },[loginState])
 
   // handle click applybtn
   const handleClickApplyBtn = () => {
@@ -142,16 +159,19 @@ const Tokens = () => {
                       <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
                     </CLink>,
       launch        : val.launch || " ",
-      price         : val.price || " ",
       _props: {
         className: "level_" + val.level + " " + splitbar
       }
     }
-    if(loginState === "success" && columns[columns.length-1]['key'] === "action"){
+    if(loginState === "success"){
+      item['price'] = val.price || " ";
       item['action'] = <>
         <CIcon onClick={()=>handleClickActions(val.id, 'E')} icon={ cilPen } className="text-white" size="sm" /> | &nbsp;
         <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
       </>
+    } else {
+      item['mcap'] = " mcap ";
+      item['t_price'] = " price ";
     }
     return item;
   })
