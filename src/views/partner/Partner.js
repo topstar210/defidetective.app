@@ -91,7 +91,7 @@ const Partner = () => {
   })
 
   return (
-    <div className='tokens-page'>
+    <div className='partner-page'>
       <CRow className='mt-3 px-lg-3'>
         <CCol xs={12}>
           <CCard className="mb-4">

@@ -5,6 +5,7 @@ import Dapps from './views/dapps/Dapps'
 import Tokens from './views/tokens/Tokens'
 import Influencers from './views/influencer/Influencer'
 import Partners from './views/partner/Partner'
+import Ads_ROI from './views/ads_ROI/Ads_ROI'
 
 
 const routes = [
@@ -12,8 +13,7 @@ const routes = [
   { path: '*', name: 'page404', element: Page404 },
   { path: '/dapps', name: 'Dapps', element: Dapps },
   { path: '/tokens', role: 1, element: Tokens },
-  { path: '/admin/dapps', role: 1, element: Dapps },
-  { path: '/admin/ads_ROI', role: 1, element: Dapps },
+  { path: '/admin/ads_ROI', role: 1, element: Ads_ROI },
   { path: '/admin/ads_token', role: 1, element: Dapps },
   { path: '/influencers', role: 1, element: Influencers },
   { path: '/partners', role: 1, element: Partners },

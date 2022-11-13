@@ -67,4 +67,10 @@ API.partner = {
   saveData      : (data) => API.post(`/partner/save`, data),
   deleteRowById : (rid) => API.post(`/partner/delete`, { rid }),
 };
+
+API.advertise = {
+  getData       : () => API.get(`/admanage/get`),
+  saveData      : (data) => API.post(`/admanage/save`, data),
+  deleteRowById : (rid) => API.post(`/admanage/delete`, { rid }),
+}
 export default API;
