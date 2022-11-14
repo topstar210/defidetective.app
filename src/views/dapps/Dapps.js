@@ -210,7 +210,7 @@ const Dapps = () => {
             <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
           </>
         }
-        items.push(item);
+        items[ind] = item;
       }));
       console.log(items)
       setItems([

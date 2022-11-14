@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppContent, AppSidebar, AppHeader } from '../components/index'
+import { AppContent, AppSidebar, AppHeader, AppFooter } from '../components/index'
 
 import { checkLogin } from "src/store/actions/app.actions"
 import { useNavigate } from 'react-router-dom'
@@ -29,6 +29,7 @@ const DefaultLayout = () => {
         <div className="body flex-grow-1">
           <AppContent />
         </div>
+        <AppFooter />
       </div>
     </div>
   )
