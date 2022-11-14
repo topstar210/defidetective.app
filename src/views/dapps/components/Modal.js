@@ -24,7 +24,6 @@ const Modal = (props) => {
     const handleClickSubmit = async() => {
         await dispatch(props.saveAppInfo(roiAppState));
         props.setMVisible(false)
-
     }
 
     useEffect(() => {

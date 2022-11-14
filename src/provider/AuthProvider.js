@@ -77,31 +77,12 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
 
     if (window.ethereum) {
-      // if (window.ethereum.chainId != "0x38") {
-      //     window.ethereum.request({
-      //         method: "wallet_addEthereumChain",
-      //         params: [{
-      //             chainId: "0x38",
-      //             rpcUrls: ["https://bsc-dataseed1.binance.org"],
-      //             chainName: "BSC Mainnet",
-      //             nativeCurrency: {
-      //                 name: "BNB",
-      //                 symbol: "BNB",
-      //                 decimals: 18
-      //             },
-      //             blockExplorerUrls: ["https://bscscan.com"]
-      //         }]
-      //     }).then(() => {
-      //         window.location.reload()
-      //     });
-      // };
-
-      if (window.ethereum.chainId != "0x61") {
+      if (window.ethereum.chainId != "0x38") {
           window.ethereum.request({
               method: "wallet_addEthereumChain",
               params: [{
-                  chainId: "0x61",
-                  rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+                  chainId: "0x38",
+                  rpcUrls: ["https://bsc-dataseed1.binance.org"],
                   chainName: "BSC Mainnet",
                   nativeCurrency: {
                       name: "BNB",
@@ -115,6 +96,25 @@ export const AuthProvider = ({ children }) => {
           });
       };
 
+      // if (window.ethereum.chainId != "0x61") {
+      //     window.ethereum.request({
+      //         method: "wallet_addEthereumChain",
+      //         params: [{
+      //             chainId: "0x61",
+      //             rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+      //             chainName: "BSC Mainnet",
+      //             nativeCurrency: {
+      //                 name: "BNB",
+      //                 symbol: "BNB",
+      //                 decimals: 18
+      //             },
+      //             blockExplorerUrls: ["https://bscscan.com"]
+      //         }]
+      //     }).then(() => {
+      //         // window.location.reload()
+      //     });
+      // };
+
       console.log('detected');
     }
 
@@ -123,9 +123,9 @@ export const AuthProvider = ({ children }) => {
         method: "eth_requestAccounts",
       })
       setAddress(accounts[0]);
+      console.log("address: ", accounts[0]);
 
-
-      // let web3 = new Web3(Web3.givenProvider);
+      let web3 = new Web3(Web3.givenProvider);
 
       // if (!web3.currentProvider) {
       //   setSnackbar({
@@ -139,8 +139,9 @@ export const AuthProvider = ({ children }) => {
       // subscribeProvider(provider);
 
       // const accounts = await web3.eth.getAccounts();
-      // const chain = await web3.eth.getChainId();
-      // setChainId(chain);
+      const chain = await web3.eth.getChainId();
+      setChainId(chain);
+      console.log("XXXXXXXXXXXXXXXXXXXXXXX: ", chain);
     } catch (err) {
       console.error(err);
       // setSnackbar({
@@ -153,8 +154,8 @@ export const AuthProvider = ({ children }) => {
 
   const disconnect = () => {
     // web3Modal.clearCachedProvider();
-    setAddress(null);
-    setChainId(null);
+    // setAddress(null);
+    // setChainId(null);
   };
 
   const handleClose = (event, reason) => {
@@ -168,12 +169,12 @@ export const AuthProvider = ({ children }) => {
     // if (web3Modal.cachedProvider) {
       connect();
     // }
-    // eslint-disable-next-line
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ address, loading, connect, disconnect, chainId, setSnackbar, provider }}
+      // value={{ address, loading, connect, disconnect, chainId, setSnackbar, provider }}
+      value={{ address, connect, chainId, setSnackbar }}
     >
       {children}
       {snackbar && (

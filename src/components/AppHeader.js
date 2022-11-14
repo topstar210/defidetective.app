@@ -13,10 +13,16 @@ import {cilMenu, cilAccountLogout, cilLockLocked } from '@coreui/icons'
 
 import { ctrlSidebar, logout } from 'src/store/actions/app.actions'
 import { useNavigate } from 'react-router-dom'
-
 import { useAuthContext } from 'src/provider/AuthProvider';
 
+export function shorten(str) {
+  if (str.length < 10) return str;
+  return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;
+}
+
 const AppHeader = () => {
+  const {address, connect } = useAuthContext();
+  console.log("Header Address: ", address);
   const dispatch = useDispatch()
   const navigate = useNavigate();
   const { loginState, sidebarShow } = useSelector((state) => state.sapp);
@@ -61,11 +67,11 @@ const AppHeader = () => {
           {
             loginState !== "success" && 
             <>
-              <CLink href="https://t.me/DefiDetectiveapp" target="_blank">
+              {/* <CLink href="https://t.me/DefiDetectiveapp" target="_blank">
                 <CAvatar src="/images/logo-icon.png" size="md" />
-              </CLink>
-              <CLink href="#" onClick={()=>alert()}>
-                Connect
+              </CLink> */}
+              <CLink className='connectBtn py-1 px-3' onClick={connect}>
+                {address ? shorten(address) : 'Connect'}
               </CLink>
             </>
           }

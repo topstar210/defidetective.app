@@ -23,6 +23,7 @@ import {
   deleteRowById
 } from "src/store/actions/dapps.actions"
 import Modal from "./components/Modal"
+import BUSDModal from "./components/BUSDModal"
 import "./dapp.scss";
 import { config } from "../../config";
 import tradeJoeRounterAbi from "../../abis/tradeJoeRouterAbi.json";
@@ -51,6 +52,7 @@ const Dapps = () => {
   const dispatch = useDispatch();
   const { loginState } = useSelector(state => state.sapp);
   const [mVisible, setMVisible] = useState(false); // modal visible state;
+  const [busdMVisible, setBUSDMVisible] = useState(false); // modal visible state;
 
   const [bnbPrice, setBnbPrice] = useState(0);
   const [maticPrice, setMaticPrice] = useState(0);
@@ -82,13 +84,21 @@ const Dapps = () => {
   const { dappList } = useSelector(state => state.dapps);
 
   // if admin, add the actions
-  if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
-    columns.push({
-      key: "action",
-      label: "E / D",
-      _props: { scope: 'col' }
-    });
-  };
+  useEffect(()=>{
+    if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
+      columns.push({
+        key: "action",
+        label: "E / D",
+        _props: { scope: 'col' }
+      });
+    } else if (columns[columns.length-1]['key'] !== "userAction") {
+      columns.push({
+        key: "userAction",
+        label: "Action",
+        _props: { scope: 'col' }
+      });
+    }
+  },[])
 
   // handle click applybtn
   const handleClickApplyBtn = () => {
@@ -108,6 +118,12 @@ const Dapps = () => {
       selectedData = appData[rId]
       setMVisible(true);
     }
+  }
+
+  const handleClickUserAction = (rId) => {
+    selectedData = appData[rId];
+    // console.log("selectedData: ", selectedData);
+    setBUSDMVisible(true);
   }
 
   // making table rows
@@ -203,13 +219,18 @@ const Dapps = () => {
             className: "level_" + val.level + " " + splitbar
           }
         }
-    
+        console.log("showFlag: ", val.show_flag);
         if(loginState === "success" && columns[columns.length-1]['key'] === "action"){
           item['action'] = <>
             <CIcon onClick={()=>handleClickActions(val.id, 'E')} icon={ cilPen } className="text-white" size="sm" /> | &nbsp;
             <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
           </>
+        } else if (columns[columns.length-1]['key'] === "userAction") {
+          item['userAction'] = <>
+            <button onClick={()=>handleClickUserAction(val.id)} className= { val.show_flag == 0 ? "actionBtn mx-1 disabledBtn" : "actionBtn mx-1"} size="sm">Action</button>
+          </>
         }
+
         items[ind] = item;
       }));
       console.log(items)
@@ -287,6 +308,11 @@ const Dapps = () => {
         visible={mVisible}
         setMVisible={setMVisible}
         saveAppInfo={saveAppInfo}
+        selectedData={selectedData}
+      />
+      <BUSDModal
+        visible={busdMVisible}
+        setMVisible={setBUSDMVisible}
         selectedData={selectedData}
       />
     </div>

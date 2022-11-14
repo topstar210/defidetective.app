@@ -5,12 +5,18 @@ import ReactDOM, { createRoot } from 'react-dom/client'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { Provider } from 'react-redux'
+import { AuthProvider } from './provider/AuthProvider'
+import { ContractProvider } from './provider/ContractProvider'
 import store from './store'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+    <AuthProvider>
+      <ContractProvider>
+      <Provider store={store}>
+        <App />
+        </Provider>
+      </ContractProvider>
+    </AuthProvider>
 )
 
 // If you want to start measuring performance in your app, pass a function

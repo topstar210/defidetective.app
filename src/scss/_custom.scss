@@ -249,3 +249,19 @@ label {
   }
 }
 
+.connectBtn {
+  background-color: black;
+  color: yellow;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.connectBtn:hover {
+  color: white;
+}
+
+.disabledBtn {
+  display: none;
+  pointer-events: none;
+}

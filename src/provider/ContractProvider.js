@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import Web3 from "web3";
 
-import abi from "../contracts/abi.json";
+import minerAbi from "../abis/minerAbi.json";
 import { useAuthContext } from "./AuthProvider";
 import { config } from "../config";
 
@@ -37,9 +37,8 @@ export const ContractProvider = ({ children }) => {
     web3Instance.setProvider(Web3.givenProvider);
 
     setWeb3(web3Instance);
-    const contract = new web3Instance.eth.Contract(abi, config.contractAddress);
+    const contract = new web3Instance.eth.Contract(minerAbi, config.contractAddress);
     setContract(contract);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chainId]);
 
   const getBnbBalance = (address) => web3.eth.getBalance(address);
