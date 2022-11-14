@@ -57,28 +57,28 @@ const Dapps = () => {
   const [avaxPrice, setAvaxPrice] = useState(0);
 
   // initial data  ---------------
+  const getTokenPrice = async () => {
+   let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${config.BSC_API_KEY}`);
+   const bnbPrice = res.data.result.ethusd;
+   setBnbPrice(bnbPrice);
+   console.log('BNB Price: ', bnbPrice);
+
+   res = await axios.get(`https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=${config.POLYGON_API_KEY}`);
+   const maticPrice = res.data.result.maticusd;
+   setMaticPrice(maticPrice);
+   console.log("Matic Price: ", maticPrice);
+
+   const Web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
+   const TradeJoeRounterContract = new Web3Instance.eth.Contract(tradeJoeRounterAbi, config.TradeJoeRouterAddress);
+   const avaxPrice = await TradeJoeRounterContract.methods.getAmountsOut(Web3.utils.toWei('1'), ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7","0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"]).call();
+   setAvaxPrice(avaxPrice[1] / 1000000);
+   console.log('Avax Price: ', avaxPrice[1] / 1000000);
+  };
   useEffect(() => {
      dispatch(getDppList());
-     const getTokenPrice = async () => {
-      let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${config.BSC_API_KEY}`);
-      const bnbPrice = res.data.result.ethusd;
-      setBnbPrice(bnbPrice);
-      console.log('BNB Price: ', bnbPrice);
-
-      res = await axios.get(`https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=${config.POLYGON_API_KEY}`);
-      const maticPrice = res.data.result.maticusd;
-      setMaticPrice(maticPrice);
-      console.log("Matic Price: ", maticPrice);
-
-      const Web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
-      const TradeJoeRounterContract = new Web3Instance.eth.Contract(tradeJoeRounterAbi, config.TradeJoeRouterAddress);
-      const avaxPrice = await TradeJoeRounterContract.methods.getAmountsOut(Web3.utils.toWei('1'), ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7","0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"]).call();
-      setAvaxPrice(avaxPrice[1] / 1000000);
-      console.log('Avax Price: ', avaxPrice[1] / 1000000);
-     };
      
      getTokenPrice();
-  }, []);
+    }, []);
   const { dappList } = useSelector(state => state.dapps);
 
   // if admin, add the actions
@@ -118,7 +118,32 @@ const Dapps = () => {
       await Promise.all(dappList.map(async (val, ind) => {
         appData[val.id] = val;
         const chainId = val.contract.includes('bsc') ? 'bsc' : (val.contract.includes('polygon') ? 'polygon' : (val.contract.includes('snowtrace') ? 'avax' : 'undefined'));
-        const tokenPrice = chainId == 'bsc' ? bnbPrice : (chainId == 'polygon' ? maticPrice : (chainId == 'avax' ? avaxPrice : 0));
+        let tokenPrice = 0;
+        if (chainId == 'bsc') {
+          if (bnbPrice == 0) {
+            tokenPrice = (await axios.get(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${config.BSC_API_KEY}`)).data.result.ethusd;
+            setBnbPrice(tokenPrice);
+          } else {
+            tokenPrice = bnbPrice;
+          }
+        } else if (chainId == 'polygon') {
+          if (maticPrice == 0) {
+            tokenPrice = (await axios.get(`https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=${config.POLYGON_API_KEY}`)).data.result.maticusd;
+            setMaticPrice(tokenPrice);
+          } else {
+            tokenPrice = maticPrice;
+          }
+        } else if (chainId == 'avax') {
+          if (avaxPrice == 0) {
+            const Web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
+            const TradeJoeRounterContract = new Web3Instance.eth.Contract(tradeJoeRounterAbi, config.TradeJoeRouterAddress);
+            const avaxPrice = await TradeJoeRounterContract.methods.getAmountsOut(Web3.utils.toWei('1'), ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7","0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"]).call();
+            tokenPrice = avaxPrice[1] / 1000000
+            setAvaxPrice(tokenPrice);
+          } else {
+            tokenPrice = avaxPrice;
+          }
+        }
         console.log("chainId: ", chainId, tokenPrice);
         let splitbar = "";
         if (dappList[ind + 1] && val.level !== dappList[ind + 1].level) {

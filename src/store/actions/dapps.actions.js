@@ -40,6 +40,7 @@ export const calcTVL = async (chainId, tokenPrice, contractAddress, tokenKind) =
         if (tokenKind.toLowerCase() == 'matic') {
             res = await axios.get(`https://api.polygonscan.com/api?module=account&action=balance&address=${contractAddress}&tag=latest&apikey=${config.POLYGON_API_KEY}`);
             balance = res.data.result / Math.pow(10, 18);
+            console.log("xxxxxxxxxx=> ", tokenPrice, balance, balance * tokenPrice);
             return balance * tokenPrice;
         } else if (tokenKind.toLowerCase() == 'usdt') {
             res = await axios.get(`https://api.polygonscan.com/api?module=account&action=tokenbalance&contractaddress=0xc2132D05D31c914a87C6611C10748AEb04B58e8F&address=${contractAddress}&tag=latest&apikey=${config.POLYGON_API_KEY}`);

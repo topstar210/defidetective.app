@@ -14,6 +14,8 @@ import {cilMenu, cilAccountLogout, cilLockLocked } from '@coreui/icons'
 import { ctrlSidebar, logout } from 'src/store/actions/app.actions'
 import { useNavigate } from 'react-router-dom'
 
+import { useAuthContext } from 'src/provider/AuthProvider';
+
 const AppHeader = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate();
@@ -58,9 +60,14 @@ const AppHeader = () => {
           }
           {
             loginState !== "success" && 
-            <CLink href="https://t.me/DefiDetectiveapp" target="_blank">
-              <CAvatar src="/images/logo-icon.png" size="md" />
-            </CLink>
+            <>
+              <CLink href="https://t.me/DefiDetectiveapp" target="_blank">
+                <CAvatar src="/images/logo-icon.png" size="md" />
+              </CLink>
+              <CLink href="#" onClick={()=>alert()}>
+                Connect
+              </CLink>
+            </>
           }
         </CHeaderNav>
       </CContainer>

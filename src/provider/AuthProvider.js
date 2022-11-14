@@ -7,7 +7,7 @@ import {
 } from "react";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+// import WalletConnectProvider from "@walletconnect/web3-provider";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
@@ -20,30 +20,30 @@ export const AuthContext = createContext({
   setSnackbar: () => null,
 });
 
-const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider, // required
-    options: {
-      rpc: {
-        56: "https://bsc-dataseed.binance.org/",
-        97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-      },
-      network: "binance",
-    },
-  },
-};
+// const providerOptions = {
+//   walletconnect: {
+//     package: WalletConnectProvider, // required
+//     options: {
+//       rpc: {
+//         56: "https://bsc-dataseed.binance.org/",
+//         97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+//       },
+//       network: "binance",
+//     },
+//   },
+// };
 
 const Alert = forwardRef((props, ref) => {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const web3Modal = new Web3Modal({
-  cacheProvider: true, // optional
-  providerOptions, // required
-});
+// const web3Modal = new Web3Modal({
+//   cacheProvider: true, // optional
+//   providerOptions, // required
+// });
 
 export const AuthProvider = ({ children }) => {
-  const [address, setAddress] = useState();
+  const [address, setAddress] = useState(null);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState(null);
   const [chainId, setChainId] = useState(null);
@@ -76,8 +76,56 @@ export const AuthProvider = ({ children }) => {
     }
     setLoading(true);
 
+    if (window.ethereum) {
+      // if (window.ethereum.chainId != "0x38") {
+      //     window.ethereum.request({
+      //         method: "wallet_addEthereumChain",
+      //         params: [{
+      //             chainId: "0x38",
+      //             rpcUrls: ["https://bsc-dataseed1.binance.org"],
+      //             chainName: "BSC Mainnet",
+      //             nativeCurrency: {
+      //                 name: "BNB",
+      //                 symbol: "BNB",
+      //                 decimals: 18
+      //             },
+      //             blockExplorerUrls: ["https://bscscan.com"]
+      //         }]
+      //     }).then(() => {
+      //         window.location.reload()
+      //     });
+      // };
+
+      if (window.ethereum.chainId != "0x61") {
+          window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                  chainId: "0x61",
+                  rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+                  chainName: "BSC Mainnet",
+                  nativeCurrency: {
+                      name: "BNB",
+                      symbol: "BNB",
+                      decimals: 18
+                  },
+                  blockExplorerUrls: ["https://bscscan.com"]
+              }]
+          }).then(() => {
+              window.location.reload()
+          });
+      };
+
+      console.log('detected');
+    }
+
     try {
-      let web3 = new Web3(Web3.givenProvider);
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      })
+      setAddress(accounts[0]);
+
+
+      // let web3 = new Web3(Web3.givenProvider);
 
       // if (!web3.currentProvider) {
       //   setSnackbar({
@@ -86,26 +134,25 @@ export const AuthProvider = ({ children }) => {
       //   });
       //   return;
       // }
-      const provider = await web3Modal.connect();
-      web3 = new Web3(provider);
-      subscribeProvider(provider);
+      // const provider = await web3Modal.connect();
+      // web3 = new Web3(provider);
+      // subscribeProvider(provider);
 
-      const accounts = await web3.eth.getAccounts();
-      const chain = await web3.eth.getChainId();
-      setAddress(accounts[0]);
-      setChainId(chain);
+      // const accounts = await web3.eth.getAccounts();
+      // const chain = await web3.eth.getChainId();
+      // setChainId(chain);
     } catch (err) {
       console.error(err);
-      setSnackbar({
-        type: "error",
-        message: "Failed to connect",
-      });
+      // setSnackbar({
+      //   type: "error",
+      //   message: "Failed to connect",
+      // });
     }
     setLoading(false);
   };
 
   const disconnect = () => {
-    web3Modal.clearCachedProvider();
+    // web3Modal.clearCachedProvider();
     setAddress(null);
     setChainId(null);
   };
@@ -118,9 +165,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (web3Modal.cachedProvider) {
+    // if (web3Modal.cachedProvider) {
       connect();
-    }
+    // }
     // eslint-disable-next-line
   }, []);
 

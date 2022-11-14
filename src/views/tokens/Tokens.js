@@ -13,7 +13,7 @@ import {
 import { cilPlus, cibExpertsExchange, cilPen } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import moment from 'moment';
-
+import axios from 'axios';
 import { 
   getData, 
   saveData, 
@@ -51,6 +51,47 @@ const Tokens = () => {
   // initial data  ---------------
   useEffect(() => { dispatch(getData()) }, []);
   const { tokenList } = useSelector(state => state.tokens);
+
+  const getTokenPrice = async (tokenAddress) => {
+    try {
+      return 0;
+      console.log("yyyyyyyyyyyyy: ", tokenAddress);
+        let res = await axios.get(`https://api.coingecko.com/api/v3/simple/token_price/binance-smart-chain?contract_addresses=${tokenAddress}&vs_currencies=usd`);
+        if (res.data[tokenAddress.toLowerCase()] != undefined) {
+            if (res.data[tokenAddress.toLowerCase()].usd != undefined)
+                return res.data[tokenAddress.toLowerCase()].usd;
+        }
+        return 0;
+    } catch (e) {
+        console.log(e);
+        return 0;
+    }
+  }
+
+  const getTotalSupply = async (tokenAddress, chainName) => {
+    try {
+        if (chainName.toUppercase() == "ETH") {
+            // const TokenContract = new ethers.Contract(tokenAddress, tokenAbi.abi, providerE);
+            // console.log("TokenContract: ", TokenContract);
+            let res = await axios.get(`https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${tokenAddress}`);
+            console.log("ETH: ", res.data.result);
+            return res.data.result;
+        } else if (chainName.toUppercase() == "BSC") {
+            // const TokenContract = new ethers.Contract(tokenAddress, tokenAbi.abi, providerB);
+            // const [decimals, totalSupply] = await Promise.all([TokenContract.decimals(), TokenContract.totalSupply()]);
+            // console.log("decimals: ", decimals);
+            // console.log("totalSupply: ", totalSupply);
+            let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=${tokenAddress}&apikey=YGKJFMK5FW1H9T9GR9VTGIT2UC5PXUTDTB`);
+            console.log("BSC: ", res.data.result);
+            return res.data.result;
+        } else {
+            return 0;
+        }
+    } catch (e) {
+        console.log(e);
+        return 0;
+    }
+}
 
   // if admin, add the actions
   if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
@@ -142,7 +183,7 @@ const Tokens = () => {
                       <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
                     </CLink>,
       launch        : val.launch || " ",
-      price         : val.price || " ",
+      price         : /*getTokenPrice(val.contract)*/0 || " ",
       _props: {
         className: "level_" + val.level + " " + splitbar
       }
