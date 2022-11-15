@@ -97,7 +97,9 @@ const Tokens = () => {
 
   // if admin, add the actions
   useEffect(()=>{
+    console.log('loginState ===>',loginState);
     if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
+      columns[columns.length-1]['key'] === "t_price" && columns.pop() && columns.pop();
       columns.push({
         key: "price",
         label: "DECIMALS",
@@ -108,7 +110,8 @@ const Tokens = () => {
         label: "E / D",
         _props: { scope: 'col' }
       });
-    } else if (columns[columns.length-1]['key'] !== "t_price") {
+    } else if (loginState !== "success" && columns[columns.length-1]['key'] !== "t_price") {
+      columns[columns.length-1]['key'] === "action" && columns.pop() && columns.pop();
       columns.push({
         key: "mcap",
         label: "MARKET CAP",
@@ -225,7 +228,7 @@ const Tokens = () => {
             <CIcon onClick={()=>handleClickActions(val.id, 'E')} icon={ cilPen } className="text-white" size="sm" /> | &nbsp;
             <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
           </>
-        } else if (columns[columns.length-1]['key'] === "t_price"){
+        } else if (loginState !== "success" && columns[columns.length-1]['key'] === "t_price"){
           item['mcap'] = '$' + mcap_val.toString();
           item['t_price'] = '$' + price_val.toString();
         }

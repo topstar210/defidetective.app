@@ -41,15 +41,12 @@ const Modal = (props) => {
     }
     // create image section end---
 
-    const [ itype, setItype ] = useState(false);
-    const handleChooseAds = (e) => {
-        setAdsState({
-            ...adsState,
-            itype: !itype,
-            level: '1',
-        });
-        setItype(!itype);
-    }
+    // const handleChooseAds = (e) => {
+    //     setAdsState({
+    //         ...adsState,
+    //         level: '1',
+    //     });
+    // }
 
     const handleClickSubmit = async() => {
         // console.log(adsState)
@@ -57,12 +54,6 @@ const Modal = (props) => {
         props.setMVisible(false)
     }
 
-    useEffect(() => {
-        setAdsState({
-            ...adsState,
-            ...props.selectedData,
-        });
-    }, [props.selectedData])
 
     return (
         <CModal size="lg" visible={props.visible} onClose={() => props.setMVisible(false)}>
@@ -72,43 +63,24 @@ const Modal = (props) => {
             <CModalBody>
                 <CRow>
                     <CCol lg={6}>
-                        <div className="form-group">
-                            <label htmlFor="onlineAds">Select On</label>
-                            <select
-                                id="onlineAds"
-                                value={ adsState.itype?1:0 }
-                                onChange={(e) => handleChooseAds(e)}
-                                className="form-control">
-                                <option value={0}>Locale</option>
-                                <option value={1}>Online</option>
-                            </select>
-                        </div>
+                        <CFormInput
+                            type="file"
+                            id="ads_img"
+                            label="IMAGE"
+                            onChange={(e) => handleChangeFile(e)}
+                            placeholder=""
+                        />
                     </CCol>
-                    {
-                        !adsState.itype &&
-                        <CCol lg={6}>
-                            <CFormInput
-                                type="file"
-                                id="ads_img"
-                                label="IMAGE"
-                                onChange={(e) => handleChangeFile(e)}
-                                placeholder=""
-                            />
-                        </CCol>
-                    }
-                    {
-                        adsState.itype && 
-                        <CCol lg={6}>
-                            <CFormInput
-                                type="text"
-                                id="ads_url"
-                                label="URL"
-                                value={adsState.ads_url || ""}
-                                onChange={(e) => handleChange(e)}
-                                placeholder=""
-                            />
-                        </CCol>
-                    }
+                    <CCol lg={6}>
+                        <CFormInput
+                            type="text"
+                            id="ads_url"
+                            label="URL"
+                            value={adsState.ads_url || ""}
+                            onChange={(e) => handleChange(e)}
+                            placeholder=""
+                        />
+                    </CCol>
                 </CRow>
                 <CRow>
                     <CCol ls={6}>

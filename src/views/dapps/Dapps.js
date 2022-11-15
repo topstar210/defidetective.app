@@ -22,6 +22,7 @@ import {
   saveAppInfo, 
   deleteRowById
 } from "src/store/actions/dapps.actions"
+import { getData as adsGetData } from "src/store/actions/advertise.actions"
 import Modal from "./components/Modal"
 import BUSDModal from "./components/BUSDModal"
 import "./dapp.scss";
@@ -77,21 +78,25 @@ const Dapps = () => {
    console.log('Avax Price: ', avaxPrice[1] / 1000000);
   };
   useEffect(() => {
-     dispatch(getDppList());
+     dispatch(getDppList()); // get dapp list
+     dispatch(adsGetData()); // get advertise list
      
      getTokenPrice();
     }, []);
   const { dappList } = useSelector(state => state.dapps);
+  const { advertises } = useSelector(state => state.adss);
 
   // if admin, add the actions
   useEffect(()=>{
     if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
+      columns[columns.length-1]['key'] === "userAction" && columns.pop();
       columns.push({
         key: "action",
         label: "E / D",
         _props: { scope: 'col' }
       });
-    } else if (columns[columns.length-1]['key'] !== "userAction") {
+    } else if (loginState !== "success" && columns[columns.length-1]['key'] !== "userAction") {
+      columns[columns.length-1]['key'] === "action" && columns.pop();
       columns.push({
         key: "userAction",
         label: "Action",
@@ -219,13 +224,12 @@ const Dapps = () => {
             className: "level_" + val.level + " " + splitbar
           }
         }
-        console.log("showFlag: ", val.show_flag);
         if(loginState === "success" && columns[columns.length-1]['key'] === "action"){
           item['action'] = <>
             <CIcon onClick={()=>handleClickActions(val.id, 'E')} icon={ cilPen } className="text-white" size="sm" /> | &nbsp;
             <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
           </>
-        } else if (columns[columns.length-1]['key'] === "userAction") {
+        } else if (loginState !== "success" && columns[columns.length-1]['key'] === "userAction") {
           item['userAction'] = <>
             <button onClick={()=>handleClickUserAction(val.id)} className= { val.show_flag == 0 ? "actionBtn mx-1 disabledBtn" : "actionBtn mx-1"} size="sm">Action</button>
           </>
@@ -239,7 +243,7 @@ const Dapps = () => {
       ]);
     }
     getItems();
-  },[dappList])
+  },[dappList, loginState])
 
   return (
     <div className='dapps-page'>
