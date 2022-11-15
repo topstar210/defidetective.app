@@ -17,10 +17,10 @@ import moment from 'moment';
 import axios from "axios";
 import Web3 from 'web3';
 
-import { 
-  getDppList, 
-  calcTVL, 
-  saveAppInfo, 
+import {
+  getDppList,
+  calcTVL,
+  saveAppInfo,
   deleteRowById
 } from "src/store/actions/dapps.actions"
 import { getData as adsGetData } from "src/store/actions/advertise.actions"
@@ -30,64 +30,97 @@ import "./dapp.scss";
 import { config } from "../../config";
 import tradeJoeRounterAbi from "../../abis/tradeJoeRouterAbi.json";
 import { useAuthContext } from 'src/provider/AuthProvider';
-
-// table header
-const columns = [
-  { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
-  { key: 'website', label: 'WEBSITE', _props: { scope: 'col' }, },
-  { key: 'defi_badge', label: 'DEFI BADGE', _props: { scope: 'col' }, },
-  { key: 'telegram', label: 'TELEGRAM', _props: { scope: 'col' }, },
-  { key: 'discord', label: 'DISCORD', _props: { scope: 'col' }, },
-  { key: 'twitter', label: 'TWITTER', _props: { scope: 'col' }, },
-  { key: 'token', label: 'TOKEN', _props: { scope: 'col' }, },
-  { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
-  { key: 'audit', label: 'AUDIT', _props: { scope: 'col' }, },
-  { key: 'fees', label: 'FEES', _props: { scope: 'col' }, },
-  { key: 'age', label: 'AGE', _props: { scope: 'col' }, },
-  { key: 'daily_percent', label: 'DAILY%', _props: { scope: 'col' }, },
-  { key: 'tvl', label: 'TVL', _props: { scope: 'col' }, },
-];
+import { myFunctions } from 'src/utils/functions';
 // table data
 let appData = {};
 let selectedData = {};
+let rows = [];
 
 const Dapps = () => {
   const dispatch = useDispatch();
-  const { address, chainId, switchNetwork } = useAuthContext();
+  const { chainId, switchNetwork } = useAuthContext();
   const { loginState } = useSelector(state => state.sapp);
+  const { dappList } = useSelector(state => state.dapps);
+  const { advertises } = useSelector(state => state.adss);
+
   const [mVisible, setMVisible] = useState(false); // modal visible state;
   const [busdMVisible, setBUSDMVisible] = useState(false); // modal visible state;
+  const [columns, setColumns] = useState([]);  // table rows
+  const [items, setItems] = useState([]);  // table rows
 
   const [bnbPrice, setBnbPrice] = useState(0);
   const [maticPrice, setMaticPrice] = useState(0);
   const [avaxPrice, setAvaxPrice] = useState(0);
-  
+
   // initial data  ---------------
   const getTokenPrice = async () => {
-   let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${config.BSC_API_KEY}`);
-   const bnbPrice = res.data.result.ethusd;
-   setBnbPrice(bnbPrice);
-   console.log('BNB Price: ', bnbPrice);
+    let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${config.BSC_API_KEY}`);
+    const bnbPrice = res.data.result.ethusd;
+    setBnbPrice(bnbPrice);
+    console.log('BNB Price: ', bnbPrice);
 
-   res = await axios.get(`https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=${config.POLYGON_API_KEY}`);
-   const maticPrice = res.data.result.maticusd;
-   setMaticPrice(maticPrice);
-   console.log("Matic Price: ", maticPrice);
+    res = await axios.get(`https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=${config.POLYGON_API_KEY}`);
+    const maticPrice = res.data.result.maticusd;
+    setMaticPrice(maticPrice);
+    // console.log("Matic Price: ", maticPrice);
 
-   const Web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
-   const TradeJoeRounterContract = new Web3Instance.eth.Contract(tradeJoeRounterAbi, config.TradeJoeRouterAddress);
-   const avaxPrice = await TradeJoeRounterContract.methods.getAmountsOut(Web3.utils.toWei('1'), ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7","0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"]).call();
-   setAvaxPrice(avaxPrice[1] / 1000000);
-   console.log('Avax Price: ', avaxPrice[1] / 1000000);
+    const Web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
+    const TradeJoeRounterContract = new Web3Instance.eth.Contract(tradeJoeRounterAbi, config.TradeJoeRouterAddress);
+    const avaxPrice = await TradeJoeRounterContract.methods.getAmountsOut(Web3.utils.toWei('1'), ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"]).call();
+    setAvaxPrice(avaxPrice[1] / 1000000);
+    // console.log('Avax Price: ', avaxPrice[1] / 1000000);
   };
   useEffect(() => {
-     dispatch(getDppList()); // get dapp list
-     dispatch(adsGetData()); // get advertise list
-     
-     getTokenPrice();
+    // table header
+    setColumns([
+      { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
+      { key: 'website', label: <div onClick={() => sortData("website")}>WEBSITE</div>, _props: { scope: 'col' }, },
+      { key: 'defi_badge', label: 'DEFI BADGE', _props: { scope: 'col' }, },
+      { key: 'telegram', label: 'TELEGRAM', _props: { scope: 'col' }, },
+      { key: 'discord', label: 'DISCORD', _props: { scope: 'col' }, },
+      { key: 'twitter', label: 'TWITTER', _props: { scope: 'col' }, },
+      { key: 'token', label: 'TOKEN', _props: { scope: 'col' }, },
+      { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
+      { key: 'audit', label: 'AUDIT', _props: { scope: 'col' }, },
+      { key: 'fees', label: 'FEES', _props: { scope: 'col' }, },
+      { key: 'age', label: 'AGE', _props: { scope: 'col' }, },
+      { key: 'daily_percent', label: 'DAILY%', _props: { scope: 'col' }, },
+      { key: 'tvl', label: <div onClick={() => sortData("tvl")}>TVL</div>, _props: { scope: 'col' }, },
+    ])
+
+    dispatch(getDppList()); // get dapp list
+    dispatch(adsGetData()); // get advertise list
+
+    getTokenPrice();
   }, []);
-  const { dappList } = useSelector(state => state.dapps);
-  const { advertises } = useSelector(state => state.adss);
+
+  // sort func
+  const sortData = (column) => {
+    if(!Boolean(localStorage.getItem('sflag'))) localStorage.setItem('sflag', 0);
+    let sflag = localStorage.getItem('sflag') == "0" ? 1 : 0;
+    localStorage.setItem('sflag', sflag);
+
+    const sortRes = myFunctions.sortData(rows, column, sflag);
+    setItems([ ...sortRes ]);
+  }
+  
+  // advertise dispaly
+  const [ads_level_1, setAds_level_1] = useState({});
+  const [ads_level_2, setAds_level_2] = useState({});
+  useEffect(() => {
+    const ads_roi = myFunctions.AdsAry(advertises, "R");
+    ads_roi['level_1'][0] && setAds_level_1(ads_roi['level_1'][0]);
+    ads_roi['level_2'][0] && setAds_level_2(ads_roi['level_2'][0]);
+    // console.log("ads_roi ===>  ",ads_roi);
+    let adsInd = 0;
+    let adsInterval = setInterval(() => {
+      ads_roi['level_1'][adsInd] && setAds_level_1(ads_roi['level_1'][adsInd]);
+      ads_roi['level_2'][adsInd] && setAds_level_2(ads_roi['level_2'][adsInd]);
+      adsInd++;
+      if (adsInd >= ads_roi['level_1'].length) adsInd = 0;
+    }, 30000)
+  }, [advertises])
+  // console.log("ads_level_1 ====> ", ads_level_1);
 
   function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -101,25 +134,10 @@ const Dapps = () => {
       return ref;
   };
   // if admin, add the actions
-  useEffect(()=>{
-    if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
-      columns[columns.length-1]['key'] === "userAction" && columns.pop();
-      columns.push({
-        key: "action",
-        label: "E / D",
-        _props: { scope: 'col' }
-      });
-    } else if (loginState !== "success" && columns[columns.length-1]['key'] !== "userAction") {
-      columns[columns.length-1]['key'] === "action" && columns.pop();
-      columns.push({
-        key: "userAction",
-        label: "Action",
-        _props: { scope: 'col' }
-      });
-    }
+  useEffect(() => {
     const ref = getRef();
     setRefAddress(ref);
-  },[])
+  }, [])
 
   // handle click applybtn
   const handleClickApplyBtn = () => {
@@ -132,9 +150,9 @@ const Dapps = () => {
   }
 
   // handle click actions(edit || delete)
-  const handleClickActions = (rId, action)=>{
-    if(action === "D"){
-      if(!confirm("Do you delete this item?")) return true;
+  const handleClickActions = (rId, action) => {
+    if (action === "D") {
+      if (!confirm("Do you delete this item?")) return true;
       dispatch(deleteRowById(rId));
     } else {
       selectedData = appData[rId]
@@ -158,6 +176,7 @@ const Dapps = () => {
     }
   }
 
+
   const getCountdown = (launchDate) => {
     const total = (Date.now() - Date.parse(launchDate)) / 1000;
     // const seconds = Math.floor((total) % 60);
@@ -174,9 +193,26 @@ const Dapps = () => {
 }
 
   // making table rows
-  const [items, setItems] = useState([]);
-  useEffect(()=>{
-    let items = [];
+  useEffect(() => {
+    if (columns.length == 0) return;
+
+    if (loginState === "success" && columns[columns.length - 1]['key'] !== "action") {
+      columns[columns.length - 1]['key'] === "userAction" && columns.pop();
+      columns.push({
+        key: "action",
+        label: "E / D",
+        _props: { scope: 'col' }
+      });
+    } else if (loginState !== "success" && columns[columns.length - 1]['key'] !== "userAction") {
+      columns[columns.length - 1]['key'] === "action" && columns.pop();
+      columns.push({
+        key: "userAction",
+        label: "Action",
+        _props: { scope: 'col' }
+      });
+    }
+
+    rows = [];
     const getItems = async()=>{
       await Promise.all(dappList.map(async (val, ind) => {
         appData[val.id] = val;
@@ -200,14 +236,14 @@ const Dapps = () => {
           if (avaxPrice == 0) {
             const Web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
             const TradeJoeRounterContract = new Web3Instance.eth.Contract(tradeJoeRounterAbi, config.TradeJoeRouterAddress);
-            const avaxPrice = await TradeJoeRounterContract.methods.getAmountsOut(Web3.utils.toWei('1'), ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7","0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"]).call();
+            const avaxPrice = await TradeJoeRounterContract.methods.getAmountsOut(Web3.utils.toWei('1'), ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"]).call();
             tokenPrice = avaxPrice[1] / 1000000
             setAvaxPrice(tokenPrice);
           } else {
             tokenPrice = avaxPrice;
           }
         }
-
+        // console.log("chainId: ", chainId, tokenPrice);
         let splitbar = "";
         if (dappList[ind + 1] && val.level !== dappList[ind + 1].level) {
           splitbar = "split-row-" + val.level;
@@ -218,10 +254,10 @@ const Dapps = () => {
         let item = {
           logo: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} alt="" /></div>,
           website: <CLink
-                className="website_link"
-                target="_blank"
-                href={val.mining_group_url}
-              >{val.mining_group}</CLink>,
+            className="website_link"
+            target="_blank"
+            href={val.mining_group_url}
+          >{val.mining_group}</CLink>,
           defi_badge: <CLink
             target="_blank"
             href={val.kyc}
@@ -267,23 +303,20 @@ const Dapps = () => {
             className: "level_" + val.level + " " + splitbar
           }
         }
-        if(loginState === "success" && columns[columns.length-1]['key'] === "action"){
-          item['action'] = <>
-            <CIcon onClick={()=>handleClickActions(val.id, 'E')} icon={ cilPen } className="text-white" size="sm" /> | &nbsp;
-            <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
-          </>
-        } else if (loginState !== "success" && columns[columns.length-1]['key'] === "userAction") {
-          item['userAction'] = <>
-            <button onClick={()=>handleClickUserAction(val.id)} className= { val.show_flag == 0 ? "actionBtn mx-1 disabledBtn" : "actionBtn mx-1"} size="sm">Action</button>
-          </>
-        }
+        // admin action
+        item['action'] = <>
+          <CIcon onClick={() => handleClickActions(val.id, 'E')} icon={cilPen} className="text-white" size="sm" /> | &nbsp;
+          <CIcon onClick={() => handleClickActions(val.id, 'D')} icon={cibExpertsExchange} className="text-white" size="sm" />
+        </>
+        // user action
+        item['userAction'] = <>
+          <button onClick={() => handleClickUserAction(val.id)} className={val.show_flag == 0 ? "actionBtn mx-1 disabledBtn" : "actionBtn mx-1"} size="sm">Action</button>
+        </>
 
-        items[ind] = item;
+        rows[ind] = item;
       }));
-
-      setItems([
-        ...items
-      ]);
+      // console.log(rows)
+      setItems([ ...rows ]);
     }
     getItems();
   },[dappList, loginState])
@@ -322,8 +355,8 @@ const Dapps = () => {
                   <div className="phcol partnership" id="partnership">
                     <div className="sponsor">
                       <div className="content">
-                        <a target="_blank" href="https://vampirekingdom.xyz/">
-                          <img src="https://defidetective.app/uploads/16670425694F2B3DB3-32A4-41B5-9758-EFEDFCF5C2C7.gif" alt="BNBMiner-S" />
+                        <a target="_blank" href={ads_level_1.link}>
+                          <img src={process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_1.img} width="100%" alt="BNBMiner-S" />
                         </a>
                       </div>
                     </div>
@@ -333,8 +366,8 @@ const Dapps = () => {
                   <div className="phcol partnership" id="partnership">
                     <div className="sponsor">
                       <div className="content">
-                        <a target="_blank" href="https://vampirekingdom.xyz/">
-                          <img src="https://defidetective.app/uploads/16670425694F2B3DB3-32A4-41B5-9758-EFEDFCF5C2C7.gif" alt="BNBMiner-S" />
+                        <a target="_blank" href={ads_level_2.link}>
+                          <img src={process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_2.img} width="100%" alt="BNBMiner-S" />
                         </a>
                       </div>
                     </div>
@@ -358,10 +391,10 @@ const Dapps = () => {
         selectedData={selectedData}
       />
       <BUSDModal
-        visible = {busdMVisible}
-        setMVisible = {setBUSDMVisible}
-        selectedData = {selectedData}
-        refAddress = {refAddress}
+        visible={busdMVisible}
+        setMVisible={setBUSDMVisible}
+        selectedData={selectedData}
+        refAddress={refAddress}
       />
     </div>
   )

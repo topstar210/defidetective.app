@@ -12,16 +12,15 @@ import {
 } from '@coreui/react'
 import { cilPlus, cibExpertsExchange, cilPen } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import moment from 'moment';
 import axios from 'axios';
-import { 
-  getData, 
-  saveData, 
+import {
+  getData,
+  saveData,
   deleteRowById
 } from "src/store/actions/tokens.actions"
 import Modal from "./components/Modal"
 import "./token.scss";
-import { MODAL_CARD_CLASSNAME } from 'web3modal'
+import { myFunctions } from 'src/utils/functions';
 
 // table header
 const columns = [
@@ -60,70 +59,40 @@ const Tokens = () => {
     try {
       let res = await axios.get(`https://api.coingecko.com/api/v3/simple/token_price/binance-smart-chain?contract_addresses=${tokenAddress}&vs_currencies=usd`);
       if (res.data[tokenAddress.toLowerCase()] != undefined) {
-          if (res.data[tokenAddress.toLowerCase()].usd != undefined)
-              return res.data[tokenAddress.toLowerCase()].usd.toFixed(3);
+        if (res.data[tokenAddress.toLowerCase()].usd != undefined)
+          return res.data[tokenAddress.toLowerCase()].usd.toFixed(3);
       }
       return 0;
     } catch (e) {
-        console.log(e);
-        return 0;
+      console.log(e);
+      return 0;
     }
   }
 
   const getTotalSupply = async (tokenAddress, chainId) => {
     try {
-        if (chainId.toUpperCase() == "ETH") {
-            // const TokenContract = new ethers.Contract(tokenAddress, tokenAbi.abi, providerE);
-            // console.log("TokenContract: ", TokenContract);
-            let res = await axios.get(`https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${tokenAddress}`);
-            console.log("ETH: ", res.data.result);
-            return res.data.result;
-        } else if (chainId.toUpperCase() == "BSC") {
-            // const TokenContract = new ethers.Contract(tokenAddress, tokenAbi.abi, providerB);
-            // const [decimals, totalSupply] = await Promise.all([TokenContract.decimals(), TokenContract.totalSupply()]);
-            // console.log("decimals: ", decimals);
-            // console.log("totalSupply: ", totalSupply);
-            let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=${tokenAddress}&apikey=YGKJFMK5FW1H9T9GR9VTGIT2UC5PXUTDTB`);
-            console.log("BSC: ", res.data.result);
-            return res.data.result;
-        } else {
-            return 0;
-        }
-    } catch (e) {
-        console.log(e);
+      if (chainId.toUpperCase() == "ETH") {
+        // const TokenContract = new ethers.Contract(tokenAddress, tokenAbi.abi, providerE);
+        // console.log("TokenContract: ", TokenContract);
+        let res = await axios.get(`https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${tokenAddress}`);
+        console.log("ETH: ", res.data.result);
+        return res.data.result;
+      } else if (chainId.toUpperCase() == "BSC") {
+        // const TokenContract = new ethers.Contract(tokenAddress, tokenAbi.abi, providerB);
+        // const [decimals, totalSupply] = await Promise.all([TokenContract.decimals(), TokenContract.totalSupply()]);
+        // console.log("decimals: ", decimals);
+        // console.log("totalSupply: ", totalSupply);
+        let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=${tokenAddress}&apikey=YGKJFMK5FW1H9T9GR9VTGIT2UC5PXUTDTB`);
+        console.log("BSC: ", res.data.result);
+        return res.data.result;
+      } else {
         return 0;
+      }
+    } catch (e) {
+      console.log(e);
+      return 0;
     }
-}
-
-  // if admin, add the actions
-  useEffect(()=>{
-    console.log('loginState ===>',loginState);
-    if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
-      columns[columns.length-1]['key'] === "t_price" && columns.pop() && columns.pop();
-      columns.push({
-        key: "price",
-        label: "DECIMALS",
-        _props: { scope: 'col' }
-      });
-      columns.push({
-        key: "action",
-        label: "E / D",
-        _props: { scope: 'col' }
-      });
-    } else if (loginState !== "success" && columns[columns.length-1]['key'] !== "t_price") {
-      columns[columns.length-1]['key'] === "action" && columns.pop() && columns.pop();
-      columns.push({
-        key: "mcap",
-        label: "MARKET CAP",
-        _props: { scope: 'col' }
-      });
-      columns.push({
-        key: "t_price",
-        label: "PRICE",
-        _props: { scope: 'col' }
-      });
-    }
-  },[loginState])
+  }
 
   // handle click applybtn
   const handleClickApplyBtn = () => {
@@ -135,9 +104,9 @@ const Tokens = () => {
   }
 
   // handle click actions(edit || delete)
-  const handleClickActions = (rId, action)=>{
-    if(action === "D"){
-      if(!confirm("Do you delete this item?")) return true;
+  const handleClickActions = (rId, action) => {
+    if (action === "D") {
+      if (!confirm("Do you delete this item?")) return true;
       dispatch(deleteRowById(rId));
     } else {
       selectedData = appData[rId]
@@ -145,14 +114,58 @@ const Tokens = () => {
     }
   }
 
+  // advertise dispaly
+  const { advertises } = useSelector(state => state.adss);
+  const [ ads_level_1, setAds_level_1 ] = useState({});
+  const [ ads_level_2, setAds_level_2 ] = useState({});
+  useEffect(()=>{
+    const ads_roi = myFunctions.AdsAry(advertises,"T");
+    ads_roi['level_1'][0] && setAds_level_1(ads_roi['level_1'][0]);
+    ads_roi['level_2'][0] && setAds_level_2(ads_roi['level_2'][0]);
+    // console.log("ads_roi ===>  ",ads_roi);
+    let adsInd = 0;
+    let adsInterval = setInterval(()=>{
+      ads_roi['level_1'][adsInd] && setAds_level_1(ads_roi['level_1'][adsInd]);
+      ads_roi['level_2'][adsInd] && setAds_level_2(ads_roi['level_2'][adsInd]);
+      adsInd++;
+      if(adsInd >= ads_roi['level_1'].length) adsInd = 0;
+    }, 30000)
+  },[advertises])
+
   // making table rows
   const [items, setItems] = useState([]);
   useEffect(() => {
+    if (loginState === "success" && columns[columns.length - 1]['key'] !== "action") {
+      columns[columns.length - 1]['key'] === "t_price" && columns.pop() && columns.pop();
+      columns.push({
+        key: "price",
+        label: "DECIMALS",
+        _props: { scope: 'col' }
+      });
+      columns.push({
+        key: "action",
+        label: "E / D",
+        _props: { scope: 'col' }
+      });
+    } else if (loginState !== "success" && columns[columns.length - 1]['key'] !== "t_price") {
+      columns[columns.length - 1]['key'] === "action" && columns.pop() && columns.pop();
+      columns.push({
+        key: "mcap",
+        label: "MARKET CAP",
+        _props: { scope: 'col' }
+      });
+      columns.push({
+        key: "t_price",
+        label: "PRICE",
+        _props: { scope: 'col' }
+      });
+    }
+
     let items = [];
     const getItem = async () => {
-      await Promise.all(tokenList.map(async(val, ind) => {
+      await Promise.all(tokenList.map(async (val, ind) => {
         appData[val.id] = val;
-    
+
         let splitbar = "";
         if (tokenList[ind + 1] && val.level !== tokenList[ind + 1].level) {
           splitbar = "split-row-" + val.level;
@@ -166,72 +179,71 @@ const Tokens = () => {
         console.log('decimal: ', decimal);
         console.log('totalSupply: ', totalSupply);
         let item = {
-          coin          : <div style={{ width: 50, height: 50 }}><img src={val.coin} alt="" /></div>,
-          name          : val.name || " ",
-          website       : <CLink
-                          className="website_link"
-                          target="_blank"
-                          href={val.website}
-                        ><span className="badge bg-success-gradient">{val.website && "website"}</span></CLink>,
-          kyc           : <CLink
-                          target="_blank"
-                          href={val.kyc}
-                        >
-                            <span className="badge bg-success-gradient">{val.kyc && "defi badge"}</span>
-                          </CLink>,
-          presale_buy   : val.presale_buy || " ",
-          chart         : <CLink
-                          target="_blank"
-                          href={val.chart}
-                        >
-                            <span className="badge bg-success-gradient">{val.chart && "chart"}</span>
-                          </CLink>,
-          chain         : val.chain || "  ",
-          telegram      : <CLink
-                          target="_blank"
-                          href={val.telegram}
-                        >
-                          <span className="badge bg-success-gradient">{val.telegram && "telegram"}</span>
-                        </CLink>,
-          discord       : <CLink
-                        target="_blank"
-                        href={val.discord}
-                        >
-                          <span className="badge bg-success-gradient">{val.discord && "discord"}</span>
-                        </CLink>,
-          twitter       : <CLink
-                            target="_blank"
-                            href={val.twitter}
-                          >
-                            <span className="badge bg-success-gradient">{val.twitter && "twitter"}</span>
-                          </CLink>,
-          audit          : <CLink
-                            target="_blank"
-                            href={val.audit}
-                          >
-                            <span className="badge bg-success-gradient">{val.audit && "audit"}</span>
-                          </CLink>,
-          contract      : <CLink
-                          target="_blank"
-                          href={val.contract}
-                        >
-                          <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
-                        </CLink>,
-          launch        : val.launch || " ",
+          coin: <div style={{ width: 50, height: 50 }}><img src={val.coin} alt="" /></div>,
+          name: val.name || " ",
+          website: <CLink
+            className="website_link"
+            target="_blank"
+            href={val.website}
+          ><span className="badge bg-success-gradient">{val.website && "website"}</span></CLink>,
+          kyc: <CLink
+            target="_blank"
+            href={val.kyc}
+          >
+            <span className="badge bg-success-gradient">{val.kyc && "defi badge"}</span>
+          </CLink>,
+          presale_buy: val.presale_buy || " ",
+          chart: <CLink
+            target="_blank"
+            href={val.chart}
+          >
+            <span className="badge bg-success-gradient">{val.chart && "chart"}</span>
+          </CLink>,
+          chain: val.chain || "  ",
+          telegram: <CLink
+            target="_blank"
+            href={val.telegram}
+          >
+            <span className="badge bg-success-gradient">{val.telegram && "telegram"}</span>
+          </CLink>,
+          discord: <CLink
+            target="_blank"
+            href={val.discord}
+          >
+            <span className="badge bg-success-gradient">{val.discord && "discord"}</span>
+          </CLink>,
+          twitter: <CLink
+            target="_blank"
+            href={val.twitter}
+          >
+            <span className="badge bg-success-gradient">{val.twitter && "twitter"}</span>
+          </CLink>,
+          audit: <CLink
+            target="_blank"
+            href={val.audit}
+          >
+            <span className="badge bg-success-gradient">{val.audit && "audit"}</span>
+          </CLink>,
+          contract: <CLink
+            target="_blank"
+            href={val.contract}
+          >
+            <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
+          </CLink>,
+          launch: val.launch || " ",
           _props: {
             className: "level_" + val.level + " " + splitbar
           }
         }
-        if(loginState === "success" && columns[columns.length-1]['key'] === "action"){
-          item['price'] = val.price || " ";
-          item['action'] = <>
-            <CIcon onClick={()=>handleClickActions(val.id, 'E')} icon={ cilPen } className="text-white" size="sm" /> | &nbsp;
-            <CIcon onClick={()=>handleClickActions(val.id, 'D')} icon={ cibExpertsExchange } className="text-white" size="sm" />  
-          </>
-        } else if (loginState !== "success" && columns[columns.length-1]['key'] === "t_price"){
-          item['mcap'] = '$' + mcap_val.toString();
-          item['t_price'] = '$' + price_val.toString();
-        }
+        // admin actions
+        item['price'] = val.price || " ";
+        item['action'] = <>
+          <CIcon onClick={() => handleClickActions(val.id, 'E')} icon={cilPen} className="text-white" size="sm" /> | &nbsp;
+          <CIcon onClick={() => handleClickActions(val.id, 'D')} icon={cibExpertsExchange} className="text-white" size="sm" />
+        </>
+        // user actions
+        item['mcap'] = '$' + mcap_val.toString();
+        item['t_price'] = '$' + price_val.toString();
         // return item;
         items[ind] = item;
       }));
@@ -241,7 +253,7 @@ const Tokens = () => {
       ]);
     }
     getItem();
-  }, [tokenList])
+  }, [tokenList, loginState])
 
   return (
     <div className='tokens-page'>
@@ -277,8 +289,8 @@ const Tokens = () => {
                   <div className="phcol partnership" id="partnership">
                     <div className="sponsor">
                       <div className="content">
-                        <a target="_blank" href="https://vampirekingdom.xyz/">
-                          <img src="https://defidetective.app/uploads/16670425694F2B3DB3-32A4-41B5-9758-EFEDFCF5C2C7.gif" alt="BNBMiner-S" />
+                        <a target="_blank" href={ ads_level_1.link }>
+                          <img src={ process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_1.img } width="100%" alt="BNBMiner-S" />
                         </a>
                       </div>
                     </div>
@@ -288,8 +300,8 @@ const Tokens = () => {
                   <div className="phcol partnership" id="partnership">
                     <div className="sponsor">
                       <div className="content">
-                        <a target="_blank" href="https://vampirekingdom.xyz/">
-                          <img src="https://defidetective.app/uploads/16670425694F2B3DB3-32A4-41B5-9758-EFEDFCF5C2C7.gif" alt="BNBMiner-S" />
+                        <a target="_blank" href={ ads_level_2.link }>
+                          <img src={ process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_2.img } width="100%" alt="BNBMiner-S" />
                         </a>
                       </div>
                     </div>

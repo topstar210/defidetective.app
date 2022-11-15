@@ -32,10 +32,12 @@ const BUSDModal = (props) => {
     useEffect(() => {
         const init = () => {
             if (props.selectedData.id === undefined) return;
+            if (props.selectedData.contract == null) return;
+            
             let web3Instance = new Web3();
             web3Instance.setProvider(Web3.givenProvider);
             setWeb3(web3Instance);
-        
+
             const contractAddress = props.selectedData.contract.slice(props.selectedData.contract.length - 42);
             console.log('contractAddress: ', contractAddress);
             setContractAddress(contractAddress);
