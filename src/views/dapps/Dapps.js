@@ -145,6 +145,21 @@ const Dapps = () => {
     setBUSDMVisible(true);
   }
 
+  const getCountdown = (launchDate) => {
+    const total = (Date.now() - Date.parse(launchDate)) / 1000;
+    // const seconds = Math.floor((total) % 60);
+    // const minutes = Math.floor((total / 60) % 60);
+    if (total >= 0) {
+      const hours = Math.floor((total / (60 * 60)) % 24);
+      const days = Math.floor(total / (60 * 60 * 24));
+      return `${days}d ${hours}h`;
+    } else {
+      const hours = Math.floor((-total / (60 * 60)) % 24);
+      const days = Math.floor(-total / (60 * 60 * 24));
+      return `In ${days}d ${hours}h`;
+    }
+}
+
   // making table rows
   const [items, setItems] = useState([]);
   useEffect(()=>{
@@ -184,7 +199,8 @@ const Dapps = () => {
         if (dappList[ind + 1] && val.level !== dappList[ind + 1].level) {
           splitbar = "split-row-" + val.level;
         }
-        
+
+        const age_val = getCountdown(val.ages);
         const tvl = await calcTVL(chainId, tokenPrice, val.contract, val.coin_token);
         let item = {
           logo: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} alt="" /></div>,
@@ -231,7 +247,7 @@ const Dapps = () => {
             <span className="badge bg-success-gradient">{val.audit && "audit"}</span>
           </CLink>,
           fees: val.fees ? val.fees : " ",
-          age: val.ages ? moment(val.ages, "").fromNow(true) : " ",
+          age: val.ages ? age_val : " ",
           daily_percent: val.daily ? val.daily : " ",
           tvl: '$' + tvl.toFixed(2),
           _props: {
