@@ -141,7 +141,6 @@ export const AuthProvider = ({ children }) => {
       // const accounts = await web3.eth.getAccounts();
       const chain = await web3.eth.getChainId();
       setChainId(chain);
-      console.log("XXXXXXXXXXXXXXXXXXXXXXX: ", chain);
     } catch (err) {
       console.error(err);
       // setSnackbar({

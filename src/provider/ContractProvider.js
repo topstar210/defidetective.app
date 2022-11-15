@@ -25,10 +25,10 @@ export const ContractProvider = ({ children }) => {
       return;
     }
     if (parseInt(chainId) !== config.chainId) {
-      setSnackbar({
-        type: "error",
-        message: "Wrong network",
-      });
+      // setSnackbar({
+      //   type: "error",
+      //   message: "Wrong network",
+      // });
       setWrongNetwork(true);
       return;
     }
