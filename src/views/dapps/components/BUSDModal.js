@@ -11,6 +11,7 @@ import {
     CRow,
     CCol
 } from '@coreui/react'
+import { useLocation } from "react-router-dom";
 import { allAbi } from "src/abis/allAbi";
 import { useDispatch } from "react-redux";
 import { config } from "src/config";
@@ -20,7 +21,7 @@ import { ContractContext } from "src/provider/ContractProvider";
 const BUSDModal = (props) => {
     console.log("BUSDMODAL: ", props.selectedData);
     const dispatch = useDispatch();
-    const { address, chainId, setSnackbar } = useAuthContext();
+    const { address, chainId, changeChain, setSnackbar } = useAuthContext();
 
     const [minerContract, setMinerContract] = useState();
     const [contractAddress, setContractAddress] = useState();
@@ -32,17 +33,19 @@ const BUSDModal = (props) => {
         const init = () => {
             if (props.selectedData.id === undefined) return;
             const chain = props.selectedData.contract.includes('bsc') ? 56 : (props.selectedData.contract.includes('polygon') ? 137 : 0);
-            if (!chainId) {
-              return;
-            }
+            console.log(chainId, " => ", chain);
+            // if (!chain) {
+            //   return;
+            // }
             if (parseInt(chainId) !== chain) {
-                console.log("BUSD Chain ID: ", chainId, " : ", chain);
-                setSnackbar({
-                    type: "error",
-                    message: "Wrong network",
-                });
-                setWrongNetwork(true);
-              return;
+                //     console.log("BUSD Chain ID: ", chainId, " : ", chain);
+                //     setSnackbar({
+                //         type: "error",
+                //         message: "Wrong network",
+                //     });
+                //     setWrongNetwork(true);
+                //   return;
+                changeChain(chain);
             }
             setWrongNetwork(false);
             let web3Instance = new Web3();
@@ -78,6 +81,18 @@ const BUSDModal = (props) => {
         init();
       }, [props.selectedData]);
 
+    function useQuery() {
+        return new URLSearchParams(useLocation().search);
+    }
+
+    const query = useQuery();
+    const getRef = () => {
+        const ref = Web3.utils.isAddress(query.get("ref"))
+            ? query.get("ref")
+            : "0xc3daa82D79660898b5F31fE2F1f53B620c927faa"; // "0x0000000000000000000000000000000000000000";
+        return ref;
+    };
+
     const [amount, setAmount] = useState(0);
 
     const handleChange = (e) => {
@@ -86,34 +101,41 @@ const BUSDModal = (props) => {
     }
 
     const handleClickApprove = async() => {
-        // console.log("approve: ", tokenContract, contractAddress, amount);
+        console.log("approve: ", amount, " => ", Web3.utils.toWei(amount.toString(), 'ether'));
+        console.log("ref: ", props.refAddress);
 
-        await tokenContract.methods.approve(contractAddress, Web3.utils.toWei(amount.toString())).
-            send({from: address});
+        try {
+            await tokenContract.methods.approve(contractAddress, Web3.utils.toWei(amount.toString(), 'ether')).
+                send({from: address});
+        } catch (err) {
+            console.log("approve error: ", err);
+        }
     }
     
     const handleClickStake = async() => {
-        await minerContract.methods.stakeStablecoins(Web3.utils.toWei(amount.toString()), config.refAddress).
-            send({from: address});
+        try {
+            await minerContract.methods.stakeStablecoins(Web3.utils.toWei(amount.toString()), config.refAddress).
+                send({from: address});
+        } catch (err) {
+            console.log("Stake error: ", err);
+        }
     }
     
     const handleClickCompound = async() => {
-        await minerContract.methods.compound().send({from: address});
+        try {
+            await minerContract.methods.compound().send({from: address});
+        } catch (err) {
+            console.log("compound error: ", err);
+        }
     }
 
     const handleClickWithdraw = async() => {
-        await minerContract.methods.withdrawDivs().send({from: address});
+        try {
+            await minerContract.methods.withdrawDivs().send({from: address});
+        } catch (err) {
+            console.log("withdraw error: ", err);
+        }
     }
-
-    // useEffect(() => {
-    //     setRoiAppState({
-    //         ...props.selectedData,
-    //         mining_group_name: props.selectedData.mining_group,
-    //         age: props.selectedData.ages,
-    //         token: props.selectedData.coin_token,
-    //         showflag: props.selectedData.show_flag ? "show" : "hide"
-    //     });
-    // }, [props.selectedData])
 
     return (
         <CModal visible={props.visible} onClose={() => props.setMVisible(false)}>

@@ -151,6 +151,85 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const changeChain = async (newChainId) => {
+    
+    setLoading(true);
+    if (newChainId == 56) {
+      if (window.ethereum) {
+        if (window.ethereum.chainId != "0x38") {
+            // window.ethereum.request({
+            //     method: "wallet_addEthereumChain",
+            //     params: [{
+            //         chainId: "0x38",
+            //         rpcUrls: ["https://bsc-dataseed1.binance.org"],
+            //         chainName: "BSC Mainnet",
+            //         nativeCurrency: {
+            //             name: "BNB",
+            //             symbol: "BNB",
+            //             decimals: 18
+            //         },
+            //         blockExplorerUrls: ["https://bscscan.com"]
+            //     }]
+            window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [
+                {
+                  chainId: '0x38'
+                }
+              ]
+            }).then(() => {
+                window.location.reload()
+            });
+        };
+      }
+    } else if (newChainId == 137) {
+      if (window.ethereum.chainId != "0x89") {
+        window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [
+            {
+              chainId: '0x89'
+            }
+          ]
+        }).then(() => {
+            window.location.reload()
+        });
+      };
+    }
+
+    try {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      })
+      setAddress(accounts[0]);
+      console.log("address: ", accounts[0]);
+
+      let web3 = new Web3(Web3.givenProvider);
+
+      // if (!web3.currentProvider) {
+      //   setSnackbar({
+      //     type: "error",
+      //     message: '"No provider was found"',
+      //   });
+      //   return;
+      // }
+      // const provider = await web3Modal.connect();
+      // web3 = new Web3(provider);
+      // subscribeProvider(provider);
+
+      // const accounts = await web3.eth.getAccounts();
+      const chain = await web3.eth.getChainId();
+      setChainId(chain);
+    } catch (err) {
+      console.error(err);
+      // setSnackbar({
+      //   type: "error",
+      //   message: "Failed to connect",
+      // });
+    }
+    setLoading(false);
+  };
+
   const disconnect = () => {
     // web3Modal.clearCachedProvider();
     // setAddress(null);
@@ -173,7 +252,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       // value={{ address, loading, connect, disconnect, chainId, setSnackbar, provider }}
-      value={{ address, connect, chainId, setSnackbar }}
+      value={{ address, connect, changeChain, chainId, setSnackbar }}
     >
       {children}
       {snackbar && (

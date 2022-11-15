@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from "react-router-dom";
 import {
   CButton,
   CCard,
@@ -86,6 +87,17 @@ const Dapps = () => {
   const { dappList } = useSelector(state => state.dapps);
   const { advertises } = useSelector(state => state.adss);
 
+  function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
+  const [refAddress, setRefAddress] = useState('0xc3daa82D79660898b5F31fE2F1f53B620c927faa');
+  const query = useQuery();
+  const getRef = () => {
+      const ref = Web3.utils.isAddress(query.get("ref"))
+          ? query.get("ref")
+          : "0xc3daa82D79660898b5F31fE2F1f53B620c927faa"; // "0x0000000000000000000000000000000000000000";
+      return ref;
+  };
   // if admin, add the actions
   useEffect(()=>{
     if(loginState === "success" && columns[columns.length-1]['key'] !== "action") {
@@ -103,6 +115,8 @@ const Dapps = () => {
         _props: { scope: 'col' }
       });
     }
+    const ref = getRef();
+    setRefAddress(ref);
   },[])
 
   // handle click applybtn
@@ -315,9 +329,10 @@ const Dapps = () => {
         selectedData={selectedData}
       />
       <BUSDModal
-        visible={busdMVisible}
-        setMVisible={setBUSDMVisible}
-        selectedData={selectedData}
+        visible = {busdMVisible}
+        setMVisible = {setBUSDMVisible}
+        selectedData = {selectedData}
+        refAddress = {refAddress}
       />
     </div>
   )
