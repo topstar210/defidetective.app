@@ -29,6 +29,7 @@ import BUSDModal from "./components/BUSDModal"
 import "./dapp.scss";
 import { config } from "../../config";
 import tradeJoeRounterAbi from "../../abis/tradeJoeRouterAbi.json";
+import { useAuthContext } from 'src/provider/AuthProvider';
 
 // table header
 const columns = [
@@ -52,6 +53,7 @@ let selectedData = {};
 
 const Dapps = () => {
   const dispatch = useDispatch();
+  const { address, chainId, switchNetwork } = useAuthContext();
   const { loginState } = useSelector(state => state.sapp);
   const [mVisible, setMVisible] = useState(false); // modal visible state;
   const [busdMVisible, setBUSDMVisible] = useState(false); // modal visible state;
@@ -59,7 +61,7 @@ const Dapps = () => {
   const [bnbPrice, setBnbPrice] = useState(0);
   const [maticPrice, setMaticPrice] = useState(0);
   const [avaxPrice, setAvaxPrice] = useState(0);
-
+  
   // initial data  ---------------
   const getTokenPrice = async () => {
    let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${config.BSC_API_KEY}`);
@@ -83,7 +85,7 @@ const Dapps = () => {
      dispatch(adsGetData()); // get advertise list
      
      getTokenPrice();
-    }, []);
+  }, []);
   const { dappList } = useSelector(state => state.dapps);
   const { advertises } = useSelector(state => state.adss);
 
@@ -122,6 +124,7 @@ const Dapps = () => {
   // handle click applybtn
   const handleClickApplyBtn = () => {
     if (loginState == "success") { // a user can open if logined
+      selectedData = {};
       setMVisible(!mVisible);
     } else {
       window.open("https://t.me/DefiSpammerAdmin", "_blank");
@@ -139,10 +142,20 @@ const Dapps = () => {
     }
   }
 
+  const getChainIdfromContract = (contract) => { // e.x. https://bscscan.com/address/0xbcae54cdf6a1b1c60ec3d44114b452179a96c1e3
+    if (contract == null) return;
+    return contract.includes('bsc') ? 56 : (contract.includes('polygon') ? 137 : (contract.includes('snowtrace') ? 43114 : 0));
+  }
+
   const handleClickUserAction = (rId) => {
     selectedData = appData[rId];
-    // console.log("selectedData: ", selectedData);
-    setBUSDMVisible(true);
+    const contractChainId = getChainIdfromContract(selectedData.contract);
+    console.log("selectedData: ", selectedData, chainId, parseInt(chainId), contractChainId);
+    if (contractChainId == chainId) {
+      setBUSDMVisible(true);
+    } else {
+      switchNetwork(contractChainId);
+    }
   }
 
   const getCountdown = (launchDate) => {
@@ -167,23 +180,23 @@ const Dapps = () => {
     const getItems = async()=>{
       await Promise.all(dappList.map(async (val, ind) => {
         appData[val.id] = val;
-        const chainId = val.contract.includes('bsc') ? 'bsc' : (val.contract.includes('polygon') ? 'polygon' : (val.contract.includes('snowtrace') ? 'avax' : 'undefined'));
+        const chainId = getChainIdfromContract(val.contract);
         let tokenPrice = 0;
-        if (chainId == 'bsc') {
+        if (chainId == 56) {
           if (bnbPrice == 0) {
             tokenPrice = (await axios.get(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${config.BSC_API_KEY}`)).data.result.ethusd;
             setBnbPrice(tokenPrice);
           } else {
             tokenPrice = bnbPrice;
           }
-        } else if (chainId == 'polygon') {
+        } else if (chainId == 137) {
           if (maticPrice == 0) {
             tokenPrice = (await axios.get(`https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=${config.POLYGON_API_KEY}`)).data.result.maticusd;
             setMaticPrice(tokenPrice);
           } else {
             tokenPrice = maticPrice;
           }
-        } else if (chainId == 'avax') {
+        } else if (chainId == 43114) {
           if (avaxPrice == 0) {
             const Web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
             const TradeJoeRounterContract = new Web3Instance.eth.Contract(tradeJoeRounterAbi, config.TradeJoeRouterAddress);
@@ -194,7 +207,7 @@ const Dapps = () => {
             tokenPrice = avaxPrice;
           }
         }
-        console.log("chainId: ", chainId, tokenPrice);
+
         let splitbar = "";
         if (dappList[ind + 1] && val.level !== dappList[ind + 1].level) {
           splitbar = "split-row-" + val.level;
@@ -267,7 +280,7 @@ const Dapps = () => {
 
         items[ind] = item;
       }));
-      console.log(items)
+
       setItems([
         ...items
       ]);

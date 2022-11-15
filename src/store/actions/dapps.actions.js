@@ -20,6 +20,7 @@ export const getDppList  = () => dispatch =>
 }
 
 export const calcTVL = async (chainId, tokenPrice, contractAddress, tokenKind) => {
+    if (contractAddress == null) return 0;
     contractAddress = contractAddress.slice(contractAddress.length-42);
     let res, balance;
     if (chainId == 'bsc') {

@@ -19,9 +19,9 @@ import { useAuthContext } from 'src/provider/AuthProvider';
 import { ContractContext } from "src/provider/ContractProvider";
 
 const BUSDModal = (props) => {
-    console.log("BUSDMODAL: ", props.selectedData);
+    // console.log("BUSDMODAL: ", props.selectedData);
     const dispatch = useDispatch();
-    const { address, chainId, changeChain, setSnackbar } = useAuthContext();
+    const { address, chainId, setSnackbar } = useAuthContext();
 
     const [minerContract, setMinerContract] = useState();
     const [contractAddress, setContractAddress] = useState();
@@ -32,30 +32,7 @@ const BUSDModal = (props) => {
     useEffect(() => {
         const init = () => {
             if (props.selectedData.id === undefined) return;
-            const chain = props.selectedData.contract.includes('bsc') ? 56 : (props.selectedData.contract.includes('polygon') ? 137 : 0);
-            console.log(chainId, " => ", chain);
-            // if (!chain) {
-            //   return;
-            // }
-            if (parseInt(chainId) !== chain) {
-                //     console.log("BUSD Chain ID: ", chainId, " : ", chain);
-                //     setSnackbar({
-                //         type: "error",
-                //         message: "Wrong network",
-                //     });
-                //     setWrongNetwork(true);
-                //   return;
-                changeChain(chain);
-            }
-            setWrongNetwork(false);
             let web3Instance = new Web3();
-            // if (chain == 56) {
-            //     web3Instance = new Web3("https://bsc-dataseed1.binance.org/");
-            // } else if (chain ==  137) {
-            //     web3Instance = new Web3('https://polygon-rpc.com/');
-            // } else {
-            //     web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
-            // }
             web3Instance.setProvider(Web3.givenProvider);
             setWeb3(web3Instance);
         
@@ -68,10 +45,10 @@ const BUSDModal = (props) => {
             setMinerContract(minerContract);
             
             let tokenAddress;
-            if (chain == 56 && props.selectedData.coin_token == 'BUSD') {
+            if (chainId == 56 && props.selectedData.coin_token == 'BUSD') {
                 console.log("herehereherehere")
                 tokenAddress = '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56';
-            } else if (chain == 137 && props.selectedData.coin_token == 'USDT') {
+            } else if (chainId == 137 && props.selectedData.coin_token == 'USDT') {
                 tokenAddress = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
             }
             const tokenContract = new web3Instance.eth.Contract(allAbi.ERC20, tokenAddress);
@@ -105,7 +82,7 @@ const BUSDModal = (props) => {
         console.log("ref: ", props.refAddress);
 
         try {
-            await tokenContract.methods.approve(contractAddress, Web3.utils.toWei(amount.toString(), 'ether')).
+            await tokenContract.methods.approve(contractAddress, Web3.utils.toWei(amount.toString(), 'mwei')).
                 send({from: address});
         } catch (err) {
             console.log("approve error: ", err);

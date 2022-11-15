@@ -21,8 +21,7 @@ export function shorten(str) {
 }
 
 const AppHeader = () => {
-  const {address, connect } = useAuthContext();
-  console.log("Header Address: ", address);
+  const {address, connect, disconnect } = useAuthContext();
   const dispatch = useDispatch()
   const navigate = useNavigate();
   const { loginState, sidebarShow } = useSelector((state) => state.sapp);
@@ -70,7 +69,7 @@ const AppHeader = () => {
               {/* <CLink href="https://t.me/DefiDetectiveapp" target="_blank">
                 <CAvatar src="/images/logo-icon.png" size="md" />
               </CLink> */}
-              <CLink className='connectBtn py-1 px-3' onClick={connect}>
+              <CLink className='connectBtn py-1 px-3' onClick={ address ? disconnect : connect }>
                 {address ? shorten(address) : 'Connect'}
               </CLink>
             </>
