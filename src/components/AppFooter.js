@@ -27,7 +27,7 @@ const AppFooter = () => {
         {
           ads_level_3.img && 
           <a target="_blank" href={ ads_level_3.link }>
-            <img src={ process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_3.img } style={{maxWidth:'500px'}} alt="BNBMiner-S" />
+            <img src={ process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_3.img } style={{maxWidth:'100%'}} alt="BNBMiner-S" />
           </a>
         }
       </div>

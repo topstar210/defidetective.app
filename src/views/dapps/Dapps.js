@@ -31,31 +31,21 @@ import { config } from "../../config";
 import tradeJoeRounterAbi from "../../abis/tradeJoeRouterAbi.json";
 import { myFunctions } from 'src/utils/functions';
 
-// table header
-const columns = [
-  { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
-  { key: 'website', label: 'WEBSITE', _props: { scope: 'col' }, },
-  { key: 'defi_badge', label: 'DEFI BADGE', _props: { scope: 'col' }, },
-  { key: 'telegram', label: 'TELEGRAM', _props: { scope: 'col' }, },
-  { key: 'discord', label: 'DISCORD', _props: { scope: 'col' }, },
-  { key: 'twitter', label: 'TWITTER', _props: { scope: 'col' }, },
-  { key: 'token', label: 'TOKEN', _props: { scope: 'col' }, },
-  { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
-  { key: 'audit', label: 'AUDIT', _props: { scope: 'col' }, },
-  { key: 'fees', label: 'FEES', _props: { scope: 'col' }, },
-  { key: 'age', label: 'AGE', _props: { scope: 'col' }, },
-  { key: 'daily_percent', label: 'DAILY%', _props: { scope: 'col' }, },
-  { key: 'tvl', label: 'TVL', _props: { scope: 'col' }, },
-];
 // table data
 let appData = {};
 let selectedData = {};
+let rows = [];
 
 const Dapps = () => {
   const dispatch = useDispatch();
   const { loginState } = useSelector(state => state.sapp);
+  const { dappList } = useSelector(state => state.dapps);
+  const { advertises } = useSelector(state => state.adss);
+
   const [mVisible, setMVisible] = useState(false); // modal visible state;
   const [busdMVisible, setBUSDMVisible] = useState(false); // modal visible state;
+  const [columns, setColumns] = useState([]);  // table rows
+  const [items, setItems] = useState([]);  // table rows
 
   const [bnbPrice, setBnbPrice] = useState(0);
   const [maticPrice, setMaticPrice] = useState(0);
@@ -71,39 +61,64 @@ const Dapps = () => {
     res = await axios.get(`https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=${config.POLYGON_API_KEY}`);
     const maticPrice = res.data.result.maticusd;
     setMaticPrice(maticPrice);
-    console.log("Matic Price: ", maticPrice);
+    // console.log("Matic Price: ", maticPrice);
 
     const Web3Instance = new Web3('https://api.avax.network/ext/bc/C/rpc');
     const TradeJoeRounterContract = new Web3Instance.eth.Contract(tradeJoeRounterAbi, config.TradeJoeRouterAddress);
     const avaxPrice = await TradeJoeRounterContract.methods.getAmountsOut(Web3.utils.toWei('1'), ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"]).call();
     setAvaxPrice(avaxPrice[1] / 1000000);
-    console.log('Avax Price: ', avaxPrice[1] / 1000000);
+    // console.log('Avax Price: ', avaxPrice[1] / 1000000);
   };
   useEffect(() => {
+    // table header
+    setColumns([
+      { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
+      { key: 'website', label: <div onClick={() => sortData("website")}>WEBSITE</div>, _props: { scope: 'col' }, },
+      { key: 'defi_badge', label: 'DEFI BADGE', _props: { scope: 'col' }, },
+      { key: 'telegram', label: 'TELEGRAM', _props: { scope: 'col' }, },
+      { key: 'discord', label: 'DISCORD', _props: { scope: 'col' }, },
+      { key: 'twitter', label: 'TWITTER', _props: { scope: 'col' }, },
+      { key: 'token', label: 'TOKEN', _props: { scope: 'col' }, },
+      { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
+      { key: 'audit', label: 'AUDIT', _props: { scope: 'col' }, },
+      { key: 'fees', label: 'FEES', _props: { scope: 'col' }, },
+      { key: 'age', label: 'AGE', _props: { scope: 'col' }, },
+      { key: 'daily_percent', label: 'DAILY%', _props: { scope: 'col' }, },
+      { key: 'tvl', label: <div onClick={() => sortData("tvl")}>TVL</div>, _props: { scope: 'col' }, },
+    ])
+
     dispatch(getDppList()); // get dapp list
     dispatch(adsGetData()); // get advertise list
 
     getTokenPrice();
   }, []);
-  const { dappList } = useSelector(state => state.dapps);
-  const { advertises } = useSelector(state => state.adss);
 
+  // sort func
+  const sortData = (column) => {
+    if(!Boolean(localStorage.getItem('sflag'))) localStorage.setItem('sflag', 0);
+    let sflag = localStorage.getItem('sflag') == "0" ? 1 : 0;
+    localStorage.setItem('sflag', sflag);
+
+    const sortRes = myFunctions.sortData(rows, column, sflag);
+    setItems([ ...sortRes ]);
+  }
+  
   // advertise dispaly
-  const [ ads_level_1, setAds_level_1 ] = useState({});
-  const [ ads_level_2, setAds_level_2 ] = useState({});
-  useEffect(()=>{
-    const ads_roi = myFunctions.AdsAry(advertises,"R");
+  const [ads_level_1, setAds_level_1] = useState({});
+  const [ads_level_2, setAds_level_2] = useState({});
+  useEffect(() => {
+    const ads_roi = myFunctions.AdsAry(advertises, "R");
     ads_roi['level_1'][0] && setAds_level_1(ads_roi['level_1'][0]);
     ads_roi['level_2'][0] && setAds_level_2(ads_roi['level_2'][0]);
     // console.log("ads_roi ===>  ",ads_roi);
     let adsInd = 0;
-    let adsInterval = setInterval(()=>{
+    let adsInterval = setInterval(() => {
       ads_roi['level_1'][adsInd] && setAds_level_1(ads_roi['level_1'][adsInd]);
       ads_roi['level_2'][adsInd] && setAds_level_2(ads_roi['level_2'][adsInd]);
       adsInd++;
-      if(adsInd >= ads_roi['level_1'].length) adsInd = 0;
+      if (adsInd >= ads_roi['level_1'].length) adsInd = 0;
     }, 30000)
-  },[advertises])
+  }, [advertises])
   // console.log("ads_level_1 ====> ", ads_level_1);
 
   function useQuery() {
@@ -150,8 +165,9 @@ const Dapps = () => {
   }
 
   // making table rows
-  const [items, setItems] = useState([]);
   useEffect(() => {
+    if (columns.length == 0) return;
+
     if (loginState === "success" && columns[columns.length - 1]['key'] !== "action") {
       columns[columns.length - 1]['key'] === "userAction" && columns.pop();
       columns.push({
@@ -168,7 +184,7 @@ const Dapps = () => {
       });
     }
 
-    let items = [];
+    rows = [];
     const getItems = async () => {
       await Promise.all(dappList.map(async (val, ind) => {
         appData[val.id] = val;
@@ -199,7 +215,7 @@ const Dapps = () => {
             tokenPrice = avaxPrice;
           }
         }
-        console.log("chainId: ", chainId, tokenPrice);
+        // console.log("chainId: ", chainId, tokenPrice);
         let splitbar = "";
         if (dappList[ind + 1] && val.level !== dappList[ind + 1].level) {
           splitbar = "split-row-" + val.level;
@@ -268,12 +284,10 @@ const Dapps = () => {
           <button onClick={() => handleClickUserAction(val.id)} className={val.show_flag == 0 ? "actionBtn mx-1 disabledBtn" : "actionBtn mx-1"} size="sm">Action</button>
         </>
 
-        items[ind] = item;
+        rows[ind] = item;
       }));
-      console.log(items)
-      setItems([
-        ...items
-      ]);
+      // console.log(rows)
+      setItems([ ...rows ]);
     }
     getItems();
   }, [dappList, loginState])
@@ -312,8 +326,8 @@ const Dapps = () => {
                   <div className="phcol partnership" id="partnership">
                     <div className="sponsor">
                       <div className="content">
-                        <a target="_blank" href={ ads_level_1.link }>
-                          <img src={ process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_1.img } width="100%" alt="BNBMiner-S" />
+                        <a target="_blank" href={ads_level_1.link}>
+                          <img src={process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_1.img} width="100%" alt="BNBMiner-S" />
                         </a>
                       </div>
                     </div>
@@ -323,8 +337,8 @@ const Dapps = () => {
                   <div className="phcol partnership" id="partnership">
                     <div className="sponsor">
                       <div className="content">
-                        <a target="_blank" href={ ads_level_2.link }>
-                          <img src={ process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_2.img } width="100%" alt="BNBMiner-S" />
+                        <a target="_blank" href={ads_level_2.link}>
+                          <img src={process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + ads_level_2.img} width="100%" alt="BNBMiner-S" />
                         </a>
                       </div>
                     </div>

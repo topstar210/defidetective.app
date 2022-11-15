@@ -19,7 +19,7 @@ import { useAuthContext } from 'src/provider/AuthProvider';
 import { ContractContext } from "src/provider/ContractProvider";
 
 const BUSDModal = (props) => {
-    console.log("BUSDMODAL: ", props.selectedData);
+    // console.log("BUSDMODAL: ", props.selectedData);
     const dispatch = useDispatch();
     const { address, chainId, changeChain, setSnackbar } = useAuthContext();
 
