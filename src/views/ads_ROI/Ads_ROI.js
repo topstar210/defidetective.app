@@ -21,7 +21,6 @@ import Modal from "./components/Modal"
 import "./ads_ROI.scss";
 
 let appData = {};
-let selectedData = {};
 
 const Ads_ROI = () => {
     const dispatch = useDispatch();
@@ -47,9 +46,12 @@ const Ads_ROI = () => {
     // making table rows
     const items = advertises.map((val, ind) => {
         appData[val.id] = val;
-        let img_url = val.image ? process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + val.image : val.link;
         let item = {
-            ads_img: <img src={img_url} className="my-3" alt="" />,
+            ads_img: <CLink 
+                        href={ val.link }
+                        target="_blank">
+                        <img src={process.env.REACT_APP_API_ENDPOINT_URI + "/../uploads/" + val.image} className="my-3" alt="" />
+                    </CLink>,
             roi_or_token: val.kind?"TOKEN":"ROI",
             level: `LEVEL ${val.level}`
         }
@@ -82,7 +84,6 @@ const Ads_ROI = () => {
                 visible={mVisible}
                 setMVisible={setMVisible}
                 saveData={saveData}
-                selectedData={selectedData}
             />
         </div>
     )
