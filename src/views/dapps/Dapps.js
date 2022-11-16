@@ -11,9 +11,8 @@ import {
   CRow,
   CTable
 } from '@coreui/react'
-import { cilPlus, cibExpertsExchange, cilPen } from '@coreui/icons'
+import { cilPlus, cibExpertsExchange, cilPen, cilSortAscending, cilSortDescending } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import moment from 'moment';
 import axios from "axios";
 import Web3 from 'web3';
 
@@ -71,10 +70,23 @@ const Dapps = () => {
     // console.log('Avax Price: ', avaxPrice[1] / 1000000);
   };
   useEffect(() => {
+    dispatch(getDppList()); // get dapp list
+    dispatch(adsGetData()); // get advertise list
+
+    getTokenPrice();
+  }, []);
+
+  useEffect(()=>{
+    let sflag = localStorage.getItem('sflag');
+    let scolumn = localStorage.getItem('scolumn');
+    let chFlag = scolumn + "_" + sflag;
     // table header
     setColumns([
       { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
-      { key: 'website', label: <div onClick={() => sortData("website")}>WEBSITE</div>, _props: { scope: 'col' }, },
+      { key: 'website', label: 
+        <div className="__sort" onClick={() => sortData("website")}>
+          WEBSITE <CIcon icon={chFlag==="website_1"?cilSortDescending:cilSortAscending} className="text-white" size="sm" />
+        </div>, _props: { scope: 'col' }, },
       { key: 'defi_badge', label: 'DEFI BADGE', _props: { scope: 'col' }, },
       { key: 'telegram', label: 'TELEGRAM', _props: { scope: 'col' }, },
       { key: 'discord', label: 'DISCORD', _props: { scope: 'col' }, },
@@ -83,23 +95,25 @@ const Dapps = () => {
       { key: 'contract', label: 'CONTRACT', _props: { scope: 'col' }, },
       { key: 'audit', label: 'AUDIT', _props: { scope: 'col' }, },
       { key: 'fees', label: 'FEES', _props: { scope: 'col' }, },
-      { key: 'age', label: 'AGE', _props: { scope: 'col' }, },
+      { key: 'age', label: 
+        <div className="__sort" onClick={() => sortData("age_realval")}>
+          AGE <CIcon icon={chFlag==="age_realval_1"?cilSortDescending:cilSortAscending} className="text-white" size="sm" />
+          </div>, _props: { scope: 'col' }, },
       { key: 'daily_percent', label: 'DAILY%', _props: { scope: 'col' }, },
-      { key: 'tvl', label: <div onClick={() => sortData("tvl")}>TVL</div>, _props: { scope: 'col' }, },
+      { key: 'tvl', label: 
+        <div className="__sort" onClick={() => sortData("tvl")}>
+          TVL <CIcon icon={chFlag==="tvl_1"?cilSortDescending:cilSortAscending} className="text-white" size="sm" />
+        </div>, _props: { scope: 'col' }, },
     ])
-
-    dispatch(getDppList()); // get dapp list
-    dispatch(adsGetData()); // get advertise list
-
-    getTokenPrice();
-  }, []);
+  },[items])
 
   // sort func
   const sortData = (column) => {
     if(!Boolean(localStorage.getItem('sflag'))) localStorage.setItem('sflag', 0);
     let sflag = localStorage.getItem('sflag') == "0" ? 1 : 0;
     localStorage.setItem('sflag', sflag);
-
+    localStorage.setItem('scolumn', column);
+    
     const sortRes = myFunctions.sortData(rows, column, sflag);
     setItems([ ...sortRes ]);
   }
@@ -297,6 +311,7 @@ const Dapps = () => {
           </CLink>,
           fees: val.fees ? val.fees : " ",
           age: val.ages ? age_val : " ",
+          age_realval: val.ages,
           daily_percent: val.daily ? val.daily : " ",
           tvl: '$' + tvl.toFixed(2),
           _props: {

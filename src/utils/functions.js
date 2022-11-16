@@ -63,6 +63,11 @@ export const myFunctions = {
                     }
                 }
                 return 0;
+            } else if(column === "age_realval") {
+                let a_val = Date.parse(a[column]) || 0;
+                let b_val = Date.parse(b[column]) || 0;
+                if (sflag) return a_val - b_val;
+                else return b_val - a_val;
             }
         });
 
