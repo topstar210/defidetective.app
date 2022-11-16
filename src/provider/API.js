@@ -38,7 +38,7 @@ API.interceptors.response.use(
 API.auth = {
   login       : (data) => API.post(`/auth/login`, data),
   register    : (data) => API.post(`/auth/register`, data),
-  chagePassword: (data) => API.post(`/auth/chagePassword`, data),
+  changePassword: (data) => API.post(`/auth/changePassword`, data),
   logout      : () => API.post(`/auth/logout`, {}),
   checkToken  : (token) => API.post(`/auth/checkToken`, {token}),
   refreshToken: () => {}

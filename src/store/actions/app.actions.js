@@ -47,3 +47,9 @@ export const checkLogin = (token) => dispatch => {
         })
     })
 }
+
+export const changePwd = (data) => dispatch => {
+    myaxios.auth.changePassword(data).then(()=>{
+        
+    })
+}

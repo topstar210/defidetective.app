@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
@@ -14,17 +14,15 @@ import {cilMenu, cilAccountLogout, cilLockLocked } from '@coreui/icons'
 import { ctrlSidebar, logout } from 'src/store/actions/app.actions'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from 'src/provider/AuthProvider';
-
-export function shorten(str) {
-  if (str.length < 10) return str;
-  return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;
-}
+import { myFunctions } from 'src/utils/functions'
+import PasswordModal from './header/PasswordModal'
 
 const AppHeader = () => {
   const {address, connect, disconnect } = useAuthContext();
   const dispatch = useDispatch()
   const navigate = useNavigate();
   const { loginState, sidebarShow } = useSelector((state) => state.sapp);
+  const [ mVisible, setMVisible ] = useState(false); // modal visible state;
 
   const handleLogout = () => {
     dispatch( logout(localStorage.getItem("app_token")) );
@@ -32,7 +30,7 @@ const AppHeader = () => {
   }
 
   const handleChangePwd = () => {
-
+    setMVisible(!mVisible);
   }
 
   return (
@@ -61,6 +59,10 @@ const AppHeader = () => {
               <CLink onClick={()=>handleLogout()}>
                 <CIcon icon={ cilAccountLogout } className="text-white" size="lg" />
               </CLink>
+              <PasswordModal
+                  visible={mVisible}
+                  setMVisible={setMVisible}
+              />
             </>
           }
           {
@@ -70,7 +72,7 @@ const AppHeader = () => {
                 <CAvatar src="/images/logo-icon.png" size="md" />
               </CLink> */}
               <CLink className='connectBtn py-1 px-3' onClick={ address ? disconnect : connect }>
-                {address ? shorten(address) : 'Connect'}
+                {address ? myFunctions.shorten(address) : 'Connect'}
               </CLink>
             </>
           }

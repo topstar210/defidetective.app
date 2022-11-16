@@ -24,8 +24,8 @@ export function appState(state = initialState, action) {
         case SET_USER_INFO:
             return {
                 ...state,
+                ...action.payload,
                 loginState: action.payload.mtype,
-                userInfo: action.payload
             }
         default:
             return { ...state };
