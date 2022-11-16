@@ -266,6 +266,10 @@ label {
   pointer-events: none;
 }
 
+.__sort{
+  cursor: pointer;
+  opacity: .8;
+}
 
 @media screen and (max-width: 769px) {
   .sidebar{

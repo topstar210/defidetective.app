@@ -22,6 +22,14 @@ const Modal = (props) => {
     }
 
     const handleClickSubmit = async() => {
+        // console.log(roiAppState);
+        if(!Boolean(roiAppState.token)) {
+            alert("Please Fill Token Field."); return;
+        } else if(!Boolean(roiAppState.contract)) {
+            alert("Please Fill Contract Field."); return;
+        } else if(!Boolean(roiAppState.level)) {
+            alert("Please Fill Level Field."); return;
+        }
         await dispatch(props.saveAppInfo(roiAppState));
         props.setMVisible(false)
     }
@@ -32,7 +40,8 @@ const Modal = (props) => {
             mining_group_name: props.selectedData.mining_group,
             age: props.selectedData.ages,
             token: props.selectedData.coin_token,
-            showflag: props.selectedData.show_flag ? "show" : "hide"
+            showflag: props.selectedData.show_flag ? "show" : "hide",
+            level: props.selectedData.level || 1
         });
     }, [props.selectedData])
 
