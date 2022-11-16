@@ -85,7 +85,7 @@ export const myFunctions = {
             else level_3.push(element);
         }
         level_1[level_1.length - 1]['_props']['className'] += "split-row-1";
-        level_2[level_2.length - 1]['_props']['className'] += "split-row-2";
+        level_2.length && level_2[level_2.length - 1]['_props']['className'] += "split-row-2";
         return [
             ...level_1,
             ...level_2,
