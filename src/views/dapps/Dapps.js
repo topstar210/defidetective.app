@@ -224,23 +224,6 @@ const Dapps = () => {
   // making table rows
   useEffect(() => {
     if (columns.length == 0) return;
-
-    // if (loginState === "success" && columns[columns.length - 1]['key'] !== "action") {
-    //   columns[columns.length - 1]['key'] === "userAction" && columns.pop();
-    //   columns.push({
-    //     key: "action",
-    //     label: "E / D",
-    //     _props: { scope: 'col' }
-    //   });
-    // } else if (loginState !== "success" && columns[columns.length - 1]['key'] !== "userAction") {
-    //   columns[columns.length - 1]['key'] === "action" && columns.pop();
-    //   columns.push({
-    //     key: "userAction",
-    //     label: "Action",
-    //     _props: { scope: 'col' }
-    //   });
-    // }
-
     rows = [];
     const getItems = async()=>{
       await Promise.all(dappList.map(async (val, ind) => {
