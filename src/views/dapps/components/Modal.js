@@ -170,7 +170,7 @@ const Modal = (props) => {
                     </CCol>
                     <CCol ls={6}>
                         <CFormInput
-                            type="date"
+                            type="datetime-local"
                             id="age"
                             value={roiAppState.age || ""}
                             onChange={(e) => handleChange(e)}

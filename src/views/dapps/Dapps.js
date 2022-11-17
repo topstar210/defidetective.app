@@ -110,7 +110,7 @@ const Dapps = () => {
       theader.push({
         key: "action",
         label: "E / D",
-        _props: { scope: 'col' }
+        _props: { scope: 'col', style:{ minWidth:"60px" } }
       });
     } else if (loginState !== "success") {
       theader.push({
@@ -217,7 +217,7 @@ const Dapps = () => {
     } else {
       const hours = Math.floor((-total / (60 * 60)) % 24);
       const days = Math.floor(-total / (60 * 60 * 24));
-      return `In ${days}d ${hours}h`;
+      return <div className="badge bg-warning-gradient">In {days}d {hours}h</div>;
     }
 }
 
