@@ -81,7 +81,7 @@ const Dapps = () => {
     let scolumn = localStorage.getItem('scolumn');
     let chFlag = scolumn + "_" + sflag;
     // table header
-    setColumns([
+    let theader = [
       { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
       { key: 'website', label: 
         <div className="__sort" onClick={() => sortData("website")}>
@@ -104,8 +104,23 @@ const Dapps = () => {
         <div className="__sort" onClick={() => sortData("tvl")}>
           TVL <CIcon icon={chFlag==="tvl_1"?cilSortDescending:cilSortAscending} className="text-white" size="sm" />
         </div>, _props: { scope: 'col' }, },
-    ])
-  },[items])
+    ]
+
+    if (loginState === "success") {
+      theader.push({
+        key: "action",
+        label: "E / D",
+        _props: { scope: 'col' }
+      });
+    } else if (loginState !== "success") {
+      theader.push({
+        key: "userAction",
+        label: "Action",
+        _props: { scope: 'col' }
+      });
+    }
+    setColumns(theader);
+  },[items, loginState])
 
   // sort func
   const sortData = (column) => {
@@ -210,21 +225,21 @@ const Dapps = () => {
   useEffect(() => {
     if (columns.length == 0) return;
 
-    if (loginState === "success" && columns[columns.length - 1]['key'] !== "action") {
-      columns[columns.length - 1]['key'] === "userAction" && columns.pop();
-      columns.push({
-        key: "action",
-        label: "E / D",
-        _props: { scope: 'col' }
-      });
-    } else if (loginState !== "success" && columns[columns.length - 1]['key'] !== "userAction") {
-      columns[columns.length - 1]['key'] === "action" && columns.pop();
-      columns.push({
-        key: "userAction",
-        label: "Action",
-        _props: { scope: 'col' }
-      });
-    }
+    // if (loginState === "success" && columns[columns.length - 1]['key'] !== "action") {
+    //   columns[columns.length - 1]['key'] === "userAction" && columns.pop();
+    //   columns.push({
+    //     key: "action",
+    //     label: "E / D",
+    //     _props: { scope: 'col' }
+    //   });
+    // } else if (loginState !== "success" && columns[columns.length - 1]['key'] !== "userAction") {
+    //   columns[columns.length - 1]['key'] === "action" && columns.pop();
+    //   columns.push({
+    //     key: "userAction",
+    //     label: "Action",
+    //     _props: { scope: 'col' }
+    //   });
+    // }
 
     rows = [];
     const getItems = async()=>{
