@@ -12,9 +12,9 @@ const DefaultLayout = () => {
   const { loginState } = useSelector(state=>state.sapp);
   
   useEffect(()=>{
-    if(loginState==="error"){
-      navigate("/dapps");
-    }
+    // if(loginState==="error"){
+    //   navigate("/dapps");
+    // }
   },[loginState])
 
   useEffect(()=>{
