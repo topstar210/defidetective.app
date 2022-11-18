@@ -48,7 +48,7 @@ const Influencer = () => {
   const items = influencers.map((val, ind) => {
     appData[val.id] = val;
     let item = {
-      logo_url: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} alt="" /></div>,
+      logo_url: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} width={val.logo_url && "100%"} alt="" /></div>,
       name: <CLink
         target="_blank"
         href={val.url}

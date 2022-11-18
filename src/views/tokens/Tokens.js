@@ -179,7 +179,7 @@ const Tokens = () => {
         console.log('decimal: ', decimal);
         console.log('totalSupply: ', totalSupply);
         let item = {
-          coin: <div style={{ width: 50, height: 50 }}><img src={val.coin} alt="" /></div>,
+          coin: <div style={{ width: 50, height: 50 }}><img src={val.coin}  width={val.coin && "100%"} alt="" /></div>,
           name: val.name || " ",
           website: <CLink
             className="website_link"
@@ -192,7 +192,12 @@ const Tokens = () => {
           >
             <span className="badge bg-success-gradient">{val.kyc && "defi badge"}</span>
           </CLink>,
-          presale_buy: val.presale_buy || " ",
+          presale_buy: <CLink
+            target="_blank"
+            href={val.presale_buy}
+          >
+            <span className="badge bg-success-gradient">{val.presale_buy && "presale/buy"}</span>
+          </CLink>,
           chart: <CLink
             target="_blank"
             href={val.chart}

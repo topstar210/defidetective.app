@@ -264,7 +264,7 @@ const Dapps = () => {
         const age_val = getCountdown(val.ages);
         const tvl = await calcTVL(chainId, tokenPrice, val.contract, val.coin_token);
         let item = {
-          logo: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} alt="" /></div>,
+          logo: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} alt="" width={val.logo_url && "100%"} /></div>,
           website: <CLink
             className="website_link"
             target="_blank"
