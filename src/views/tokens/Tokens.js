@@ -319,6 +319,12 @@ const Tokens = () => {
                 <CIcon icon={cilPlus} className="text-white" size="sm" /> APPLY LISTING
               </CButton>
               <CTable columns={columns} items={items} responsive />
+              {
+                !items.length && 
+                <div style={{ textAlign:"center", margin:"0 auto" }}>
+                  <img src="/Half-Moon-Loading.svg" alt="" />
+                </div>
+              }
             </CCardBody>
           </CCard>
         </CCol>
