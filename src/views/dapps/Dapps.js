@@ -18,7 +18,7 @@ import Web3 from 'web3';
 
 import {
   getDppList,
-  calcTVL,
+  // calcTVL,
   saveAppInfo,
   deleteRowById
 } from "src/store/actions/dapps.actions"
@@ -29,6 +29,7 @@ import "./dapp.scss";
 import { config } from "../../config";
 import tradeJoeRounterAbi from "../../abis/tradeJoeRouterAbi.json";
 import { useAuthContext } from 'src/provider/AuthProvider';
+import { useContractContext } from 'src/provider/ContractProvider';
 import { myFunctions } from 'src/utils/functions';
 // table data
 let appData = {};
@@ -38,6 +39,9 @@ let rows = [];
 const Dapps = () => {
   const dispatch = useDispatch();
   const { chainId, switchNetwork } = useAuthContext();
+  const { getBnbBalance, getBusdBalance, getMaticBalance, fromWei } = useContractContext();
+  
+
   const { loginState } = useSelector(state => state.sapp);
   const { dappList } = useSelector(state => state.dapps);
   const { advertises } = useSelector(state => state.adss);
@@ -56,7 +60,7 @@ const Dapps = () => {
     let res = await axios.get(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${config.BSC_API_KEY}`);
     const bnbPrice = res.data.result.ethusd;
     setBnbPrice(bnbPrice);
-    console.log('BNB Price: ', bnbPrice);
+    // console.log('BNB Price: ', bnbPrice);
 
     res = await axios.get(`https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=${config.POLYGON_API_KEY}`);
     const maticPrice = res.data.result.maticusd;
@@ -69,7 +73,86 @@ const Dapps = () => {
     setAvaxPrice(avaxPrice[1] / 1000000);
     // console.log('Avax Price: ', avaxPrice[1] / 1000000);
   };
-  useEffect(() => {
+
+  const calcTVL = async (chainId, tokenPrice, contractAddress, tokenKind) => {
+    if (contractAddress == null) return 0;
+
+    contractAddress = contractAddress.slice(contractAddress.length-42);
+    let res, balance;
+    if (chainId == 56) {
+        if (tokenKind.toLowerCase() == 'bnb') {
+            try {
+                balance = await getBnbBalance(contractAddress);
+                // res = await axios.get(`https://api.bscscan.com/api?module=account&action=balance&address=${contractAddress}&tag=latest&apikey=${config.BSC_API_KEY}`);
+                // console.log("bnb Amount: ", fromWei(balance), " = ", contractAddress);
+                
+                return fromWei(balance) * tokenPrice;
+            } catch {
+                return 0;
+            }
+        } else if (tokenKind.toLowerCase() == 'busd') {
+            try {
+                balance = await getBusdBalance(contractAddress);
+                // console.log("BUSD Amount: ", fromWei(balance), " = ", contractAddress);
+                
+                return fromWei(balance);
+                // res = await axios.get(`https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56&address=${contractAddress}&tag=latest&apikey=${config.BSC_API_KEY}`);
+                // return res.data.result / Math.pow(10, 18);
+            } catch {
+                return 0;
+            }
+        } else if (tokenKind.toLowerCase() == 'usdt') {
+            try {
+                res = await axios.get(`https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0x55d398326f99059fF775485246999027B3197955&address=${contractAddress}&tag=latest&apikey=YGKJFMK5FW1H9T9GR9VTGIT2UC5PXUTDTB`);
+                return res.data.result / Math.pow(10, 18);
+            } catch {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    } else if (chainId == 137) { //Polygon
+      console.log("Polygon: ", tokenKind.toLowerCase());
+        if (tokenKind.toLowerCase() == 'matic') {
+            try {
+              balance = await getMaticBalance(contractAddress);
+              console.log("Matic Amount= ", fromWei(balance));
+              return fromWei(balance) * tokenPrice;
+
+                // res = await axios.get(`https://api.polygonscan.com/api?module=account&action=balance&address=${contractAddress}&tag=latest&apikey=${config.POLYGON_API_KEY}`);
+            } catch {
+                return 0;
+            }
+        } else if (tokenKind.toLowerCase() == 'usdt') {
+            try {
+                res = await axios.get(`https://api.polygonscan.com/api?module=account&action=tokenbalance&contractaddress=0xc2132D05D31c914a87C6611C10748AEb04B58e8F&address=${contractAddress}&tag=latest&apikey=${config.POLYGON_API_KEY}`);
+                return res.data.result / Math.pow(10, 6);
+            } catch {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    } else if (chainId == 43114) { 
+        if (tokenKind.toLowerCase() == 'avax') {
+            try {
+                res = await axios.get(`https://api.snowtrace.io/api?module=account&action=balance&address=${contractAddress}&tag=latest&apikey=ZVI4N9MEVBXDANDD4NPSXQI2NZEC9SYESU`);
+                balance = res.data.result / Math.pow(10, 18);
+                return balance * tokenPrice;
+            } catch {
+                return 0;
+            }
+        } else if (tokenKind.toLowerCase() == 'usdt') {
+        
+        } else {
+            return 0;
+        }
+    } else {
+        return 0;
+    }
+}
+
+useEffect(() => {
     dispatch(getDppList()); // get dapp list
     dispatch(adsGetData()); // get advertise list
 
@@ -197,7 +280,7 @@ const Dapps = () => {
   const handleClickUserAction = (rId) => {
     selectedData = appData[rId];
     const contractChainId = getChainIdfromContract(selectedData.contract);
-    console.log("selectedData: ", selectedData, chainId, parseInt(chainId), contractChainId);
+    // console.log("selectedData: ", selectedData, chainId, parseInt(chainId), contractChainId);
     if (contractChainId == chainId) {
       setBUSDMVisible(true);
     } else {
@@ -263,6 +346,7 @@ const Dapps = () => {
 
         const age_val = getCountdown(val.ages);
         const tvl = await calcTVL(chainId, tokenPrice, val.contract, val.coin_token);
+        
         let item = {
           logo: <div style={{ width: 50, height: 50 }}><img src={val.logo_url} alt="" width={val.logo_url && "100%"} /></div>,
           website: <CLink
@@ -311,7 +395,7 @@ const Dapps = () => {
           age: val.ages ? age_val : " ",
           age_realval: val.ages,
           daily_percent: val.daily ? val.daily : " ",
-          tvl: '$' + tvl.toFixed(2),
+          tvl: '$' + Number(tvl).toFixed(2),
           _props: {
             className: "level_" + val.level + " " + splitbar
           }
