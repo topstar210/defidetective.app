@@ -70,6 +70,106 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const loadWeb3 = async () => 
+  {
+    if (window.ethereum) 
+    {
+      window.web3 = new Web3(window.ethereum);
+      window.web3.eth.handleRevert = true;
+    } 
+    else if (window.web3) 
+    {
+      window.web3 = new Web3(Web3.givenProvider);
+      window.web3.eth.handleRevert = true;
+    } 
+    else {
+      // window.alert(
+      //   "Non-Ethereum browser detected. Please connect and unlock your wallet."
+      // );
+      return;
+    }
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', function (chainId) {
+        checkNetworkById(chainId);
+
+      });
+      window.web3.eth.getChainId().then((chainId) => {
+        checkNetworkById(chainId);
+
+      })
+      window.ethereum.on('disconnect', function(error  /*:ProviderRpcError*/) {
+        //alert("disconnected, " + error);      
+        store.dispatch(setConnectedWalletAddress(0))
+        store.dispatch(setWalletStatus(false));
+      });
+      window.ethereum.on('accountsChanged', function(accounts /*: Array<string>*/) {
+        //  alert("wallet "+accounts[0]+" is connected");
+        if(accounts[0]   !== undefined)
+        {
+          store.dispatch(setConnectedWalletAddress(accounts[0]))
+          store.dispatch(setWalletStatus(true));
+        }
+        if(accounts.length === 0) store.dispatch(setWalletStatus(false));
+      });
+    }
+  };
+
+  const checkNetwork = async () => {
+    if (window.web3) {
+      const chainId = await window.web3.eth.getChainId();
+      return checkNetworkById(chainId);
+    }
+  }
+
+  const checkNetworkById = async (chainId) => {
+    if (window.web3.utils.toHex(chainId) !== window.web3.utils.toHex(config.chainId)) 
+    {
+      await changeNetwork();      
+    }
+    const cid = await window.web3.eth.getChainId();
+    store.dispatch(setConnectedChainId(cid));
+    return (window.web3.utils.toHex(cid) === window.web3.utils.toHex(config.chainId) )
+  }
+
+  const changeNetwork = async () => 
+  {
+    try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: window.web3.utils.toHex(config.chainId) }],
+        });
+      } 
+    catch (switchError) 
+      {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (switchError.code === 4902) 
+        {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: window.web3.utils.toHex(config.chainId),
+                  chainName: 'Cronos',
+                  rpcUrls: [config.testNetUrl] /* ... */,
+                },
+              ],
+            });
+            return {
+              success : true,
+              message : "switching succeed"
+            }
+          } catch (addError) {          
+            return {
+              success : false,
+              message : "Switching failed." + addError.message
+            }
+          }
+        }
+      }
+  }
+
+
   const connect = async () => {
     console.log("ethereum => ", ethereum);
     console.log("Window.ethereum => ", window.ethereum);
@@ -78,7 +178,8 @@ export const AuthProvider = ({ children }) => {
       .request({method: "eth_requestAccounts"})
       .then((accounts) => {
         setAddress(accounts[0]); 
-        setChainId(ethereum.chainId)})
+        setChainId(ethereum.chainId);
+      })
       .catch((err) => {
         if (err.code === 4001) {
           // EIP-1193 userRejectedRequest error
@@ -277,6 +378,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // if (web3Modal.cachedProvider) {
       // connect();
+      loadWeb3();
       connect();
     // }
   }, []);
