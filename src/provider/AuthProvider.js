@@ -99,17 +99,20 @@ export const AuthProvider = ({ children }) => {
       })
       window.ethereum.on('disconnect', function(error  /*:ProviderRpcError*/) {
         //alert("disconnected, " + error);      
-        store.dispatch(setConnectedWalletAddress(0))
-        store.dispatch(setWalletStatus(false));
+        // store.dispatch(setConnectedWalletAddress(0))
+        // store.dispatch(setWalletStatus(false));
+        setAddress(null);
       });
       window.ethereum.on('accountsChanged', function(accounts /*: Array<string>*/) {
         //  alert("wallet "+accounts[0]+" is connected");
         if(accounts[0]   !== undefined)
         {
-          store.dispatch(setConnectedWalletAddress(accounts[0]))
-          store.dispatch(setWalletStatus(true));
+          // store.dispatch(setConnectedWalletAddress(accounts[0]))
+          // store.dispatch(setWalletStatus(true));
+
+          setAddress(accounts[0]);
         }
-        if(accounts.length === 0) store.dispatch(setWalletStatus(false));
+        // if(accounts.length === 0) store.dispatch(setWalletStatus(false));
       });
     }
   };
@@ -127,7 +130,8 @@ export const AuthProvider = ({ children }) => {
       await changeNetwork();      
     }
     const cid = await window.web3.eth.getChainId();
-    store.dispatch(setConnectedChainId(cid));
+    // store.dispatch(setConnectedChainId(cid));
+    setChainId(cid);
     return (window.web3.utils.toHex(cid) === window.web3.utils.toHex(config.chainId) )
   }
 
