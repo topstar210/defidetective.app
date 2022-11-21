@@ -24,7 +24,7 @@ import { myFunctions } from 'src/utils/functions';
 
 // table header
 const columns = [
-  { key: 'coin', label: 'COIN', _props: { scope: 'col' }, },
+  { key: 'coin', label: 'BADGE', _props: { scope: 'col' }, },
   { key: 'name', label: 'NAME', _props: { scope: 'col' }, },
   { key: 'website', label: 'WEBSITE', _props: { scope: 'col' }, },
   { key: 'kyc', label: 'DEFI BADGE', _props: { scope: 'col' }, },
@@ -176,6 +176,7 @@ const Tokens = () => {
         const totalSupply = await getTotalSupply(tokenAddress, chainId);
         const decimal = val.price;
         const mcap_val = numberWithCommas((price_val * totalSupply / Math.pow(10, decimal)).toFixed(2));
+        const age_val = myFunctions.getCountdown(val.launch);
         console.log('decimal: ', decimal);
         console.log('totalSupply: ', totalSupply);
         let item = {
@@ -235,7 +236,7 @@ const Tokens = () => {
           >
             <span className="badge bg-success-gradient">{val.contract && "contract"}</span>
           </CLink>,
-          launch: val.launch || " ",
+          launch: val.launch ? age_val : " ",
           _props: {
             className: "level_" + val.level + " " + splitbar
           }

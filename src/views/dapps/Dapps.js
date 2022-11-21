@@ -40,7 +40,11 @@ const Dapps = () => {
   const dispatch = useDispatch();
   const { chainId, switchNetwork } = useAuthContext();
   const { getBnbBalance, getBusdBalance, getMaticBalance, fromWei } = useContractContext();
-  
+  const [newChainId, setNewChainId] = useState(null);
+  useEffect(() => {
+    setNewChainId(chainId);
+  }, [chainId]);
+  console.log("Dapps ChainID: ", chainId);
 
   const { loginState } = useSelector(state => state.sapp);
   const { dappList } = useSelector(state => state.dapps);
@@ -165,7 +169,7 @@ useEffect(() => {
     let chFlag = scolumn + "_" + sflag;
     // table header
     let theader = [
-      { key: 'logo', label: 'LOGO', _props: { scope: 'col' }, },
+      { key: 'logo', label: 'BADGE', _props: { scope: 'col' }, },
       { key: 'website', label: 
         <div className="__sort" onClick={() => sortData("website")}>
           WEBSITE <CIcon icon={chFlag==="website_1"?cilSortDescending:cilSortAscending} className="text-white" size="sm" />
@@ -281,28 +285,18 @@ useEffect(() => {
     selectedData = appData[rId];
     const contractChainId = getChainIdfromContract(selectedData.contract);
     // console.log("selectedData: ", selectedData, chainId, parseInt(chainId), contractChainId);
-    if (contractChainId == chainId) {
+    console.log("UserAction: ", selectedData, Web3.utils.toHex(newChainId), Web3.utils.toHex(contractChainId));
+    if (Web3.utils.toHex(contractChainId) == Web3.utils.toHex(newChainId)) {
+
       setBUSDMVisible(true);
     } else {
+
       switchNetwork(contractChainId);
     }
   }
 
 
-  const getCountdown = (launchDate) => {
-    const total = (Date.now() - Date.parse(launchDate)) / 1000;
-    // const seconds = Math.floor((total) % 60);
-    // const minutes = Math.floor((total / 60) % 60);
-    if (total >= 0) {
-      const hours = Math.floor((total / (60 * 60)) % 24);
-      const days = Math.floor(total / (60 * 60 * 24));
-      return `${days}d ${hours}h`;
-    } else {
-      const hours = Math.floor((-total / (60 * 60)) % 24);
-      const days = Math.floor(-total / (60 * 60 * 24));
-      return <div className="badge bg-warning-gradient">In {days}d {hours}h</div>;
-    }
-}
+
 
   // making table rows
   useEffect(() => {
@@ -344,7 +338,7 @@ useEffect(() => {
           splitbar = "split-row-" + val.level;
         }
 
-        const age_val = getCountdown(val.ages);
+        const age_val = myFunctions.getCountdown(val.ages);
         const tvl = await calcTVL(chainId, tokenPrice, val.contract, val.coin_token);
         
         let item = {
@@ -497,7 +491,7 @@ useEffect(() => {
         visible={busdMVisible}
         setMVisible={setBUSDMVisible}
         selectedData={selectedData}
-        refAddress={refAddress}
+        refAddress={getRef()}
       />
     </div>
   )

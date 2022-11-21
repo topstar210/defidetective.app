@@ -96,5 +96,20 @@ export const myFunctions = {
     shorten: (str) => {
         if (str.length < 10) return str;
         return `${str.slice(0, 6)}...${str.slice(str.length - 4)}`;
+    },
+
+    getCountdown: (launchDate) => {
+        const total = (Date.now() - Date.parse(launchDate)) / 1000;
+        // const seconds = Math.floor((total) % 60);
+        // const minutes = Math.floor((total / 60) % 60);
+        if (total >= 0) {
+          const hours = Math.floor((total / (60 * 60)) % 24);
+          const days = Math.floor(total / (60 * 60 * 24));
+          return `${days}d ${hours}h`;
+        } else {
+          const hours = Math.floor((-total / (60 * 60)) % 24);
+          const days = Math.floor(-total / (60 * 60 * 24));
+          return <div className="badge bg-warning-gradient">In {days}d {hours}h</div>;
+        }
     }
 }

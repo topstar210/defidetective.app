@@ -49,26 +49,26 @@ export const AuthProvider = ({ children }) => {
   const [chainId, setChainId] = useState(null);
   const [provider, setProvider] = useState(null);
 
-  const subscribeProvider = (provider) => {
-    setProvider(provider);
+  // const subscribeProvider = (provider) => {
+  //   setProvider(provider);
 
-    provider.on("disconnect", (error) => {
-      console.log(error);
-      setChainId(null);
-      setAddress(null);
-    });
-    provider.on("accountsChanged", (accounts) => {
-      setAddress(accounts[0]);
-      setSnackbar({
-        type: "info",
-        message: "Account Changed",
-      });
-    });
-    // Subscribe to chainId change
-    provider.on("chainChanged", (chainId) => {
-      setChainId(chainId);
-    });
-  };
+  //   provider.on("disconnect", (error) => {
+  //     console.log(error);
+  //     setChainId(null);
+  //     setAddress(null);
+  //   });
+  //   provider.on("accountsChanged", (accounts) => {
+  //     setAddress(accounts[0]);
+  //     setSnackbar({
+  //       type: "info",
+  //       message: "Account Changed",
+  //     });
+  //   });
+  //   // Subscribe to chainId change
+  //   provider.on("chainChanged", (chainId) => {
+  //     setChainId(chainId);
+  //   });
+  // };
 
   const loadWeb3 = async () => 
   {
@@ -93,10 +93,10 @@ export const AuthProvider = ({ children }) => {
         checkNetworkById(chainId);
 
       });
-      window.web3.eth.getChainId().then((chainId) => {
-        checkNetworkById(chainId);
+      // window.web3.eth.getChainId().then((chainId) => {
+      //   checkNetworkById(chainId);
 
-      })
+      // })
       window.ethereum.on('disconnect', function(error  /*:ProviderRpcError*/) {
         //alert("disconnected, " + error);      
         // store.dispatch(setConnectedWalletAddress(0))
@@ -124,54 +124,54 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const checkNetworkById = async (chainId) => {
-    if (window.web3.utils.toHex(chainId) !== window.web3.utils.toHex(config.chainId)) 
+  const checkNetworkById = async (newChainId) => {
+    if (window.web3.utils.toHex(newChainId) !== window.web3.utils.toHex(chainId)) 
     {
-      await changeNetwork();      
+      await switchNetwork(newChainId);
     }
     const cid = await window.web3.eth.getChainId();
     // store.dispatch(setConnectedChainId(cid));
     setChainId(cid);
-    return (window.web3.utils.toHex(cid) === window.web3.utils.toHex(config.chainId) )
+    return (window.web3.utils.toHex(cid) === window.web3.utils.toHex(newChainId) )
   }
 
-  const changeNetwork = async () => 
-  {
-    try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: window.web3.utils.toHex(config.chainId) }],
-        });
-      } 
-    catch (switchError) 
-      {
-        // This error code indicates that the chain has not been added to MetaMask.
-        if (switchError.code === 4902) 
-        {
-          try {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: window.web3.utils.toHex(config.chainId),
-                  chainName: 'Cronos',
-                  rpcUrls: [config.testNetUrl] /* ... */,
-                },
-              ],
-            });
-            return {
-              success : true,
-              message : "switching succeed"
-            }
-          } catch (addError) {          
-            return {
-              success : false,
-              message : "Switching failed." + addError.message
-            }
-          }
-        }
-      }
-  }
+  // const changeNetwork = async (chainId) => 
+  // {
+  //   try {
+  //       await window.ethereum.request({
+  //         method: 'wallet_switchEthereumChain',
+  //         params: [{ chainId: window.web3.utils.toHex(chainId) }],
+  //       });
+  //     } 
+  //   catch (switchError) 
+  //     {
+  //       // This error code indicates that the chain has not been added to MetaMask.
+  //       if (switchError.code === 4902) 
+  //       {
+  //         try {
+  //           await window.ethereum.request({
+  //             method: 'wallet_addEthereumChain',
+  //             params: [
+  //               {
+  //                 chainId: window.web3.utils.toHex(config.chainId),
+  //                 chainName: 'Cronos',
+  //                 rpcUrls: [config.testNetUrl] /* ... */,
+  //               },
+  //             ],
+  //           });
+  //           return {
+  //             success : true,
+  //             message : "switching succeed"
+  //           }
+  //         } catch (addError) {          
+  //           return {
+  //             success : false,
+  //             message : "Switching failed." + addError.message
+  //           }
+  //         }
+  //       }
+  //     }
+  // }
 
 
   const connect = async () => {
@@ -292,7 +292,7 @@ export const AuthProvider = ({ children }) => {
               method: "wallet_addEthereumChain",
               params: [{
                   chainId: "0x38",
-                  rpcUrls: ["https://bsc-dataseed1.binance.org"],
+                  rpcUrls: ["https://bsc-mainnet.public.blastapi.io"],
                   chainName: "BSC Mainnet",
                   nativeCurrency: {
                       name: "BNB",
